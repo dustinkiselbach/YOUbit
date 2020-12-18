@@ -12,7 +12,7 @@ const fonts = {
   'Glacial-Regular': require('./assets/fonts/GlacialIndifference-Regular.otf')
 }
 
-const signedIn = false
+const signedIn = true
 
 const App: React.FC = () => {
   return (

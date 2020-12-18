@@ -1,21 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react'
+import { ThemeProvider } from 'styled-components'
+import { LoadAssets } from './src/components'
+import { AuthStack, MainTab } from './src/navigators'
+import { myTheme } from './src/themes/myTheme'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+const fonts = {
+  'OpenSans-Bold': require('./assets/fonts/OpenSans-Bold.ttf'),
+  'OpenSans-Light': require('./assets/fonts/OpenSans-Light.ttf'),
+  'OpenSans-Regular': require('./assets/fonts/OpenSans-Regular.ttf'),
+  'Glacial-Bold': require('./assets/fonts/GlacialIndifference-Bold.otf'),
+  'Glacial-Regular': require('./assets/fonts/GlacialIndifference-Regular.otf')
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const signedIn = false
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider theme={myTheme}>
+      <LoadAssets {...{ fonts }}>
+        <NavigationFlow />
+      </LoadAssets>
+    </ThemeProvider>
+  )
+}
+
+const NavigationFlow: React.FC = () => {
+  if (signedIn) {
+    return <MainTab />
+  } else {
+    return <AuthStack />
+  }
+}
+
+export default App

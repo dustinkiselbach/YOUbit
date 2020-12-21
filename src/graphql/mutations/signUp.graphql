@@ -1,0 +1,22 @@
+mutation userSignUp(
+  $email: String!
+  $password: String!
+  $passwordConfirmation: String!
+  $confirmSuccessUrl: String!
+  $name: String!
+) {
+  userSignUp(
+    email: $email
+    password: $password
+    passwordConfirmation: $passwordConfirmation
+    confirmSuccessUrl: $confirmSuccessUrl
+    name: $name
+  ) {
+    user {
+      ...RegularUser
+    }
+    credentials {
+      ...UserCredentials
+    }
+  }
+}

@@ -3,8 +3,12 @@ import { View } from 'react-native'
 import { Container, TextField, Button, Spacer, Text, Link } from '../components'
 import { Formik } from 'formik'
 import { AuthStackNav } from '../types'
+import { useUserLoginMutation } from '../generated/graphql'
+import { useLogin } from '../utils'
 
 const Login: React.FC<AuthStackNav<'Login'>> = ({ navigation }) => {
+  const [userLogin] = useUserLoginMutation()
+  const [login] = useLogin()
   return (
     <Container>
       <Text variant='h1'>Login</Text>
@@ -13,7 +17,14 @@ const Login: React.FC<AuthStackNav<'Login'>> = ({ navigation }) => {
         validateOnChange={false}
         initialValues={{ email: '', password: '' }}
         onSubmit={async values => {
-          console.log(values)
+          try {
+            const res = await userLogin({ variables: values })
+            if (res.data?.userLogin?.credentials) {
+              login(res.data.userLogin.credentials)
+            }
+          } catch (err) {
+            console.log((err as Error).message)
+          }
         }}
       >
         {({ handleSubmit, isSubmitting }) => (

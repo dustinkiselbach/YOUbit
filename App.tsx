@@ -3,6 +3,9 @@ import { ThemeProvider } from 'styled-components'
 import { LoadAssets } from './src/components'
 import { AuthStack, MainTab } from './src/navigators'
 import { myTheme } from './src/themes/myTheme'
+import { ApolloProvider } from '@apollo/client'
+import { AuthContextProvider, useAuthStateContext } from './src/context'
+import { client } from './src/utils'
 
 const fonts = {
   'OpenSans-Bold': require('./assets/fonts/OpenSans-Bold.ttf'),
@@ -12,19 +15,23 @@ const fonts = {
   'Glacial-Regular': require('./assets/fonts/GlacialIndifference-Regular.otf')
 }
 
-const signedIn = true
-
 const App: React.FC = () => {
   return (
-    <ThemeProvider theme={myTheme}>
-      <LoadAssets {...{ fonts }}>
-        <NavigationFlow />
-      </LoadAssets>
-    </ThemeProvider>
+    <ApolloProvider {...{ client }}>
+      <AuthContextProvider>
+        <ThemeProvider theme={myTheme}>
+          <LoadAssets {...{ fonts }}>
+            <NavigationFlow />
+          </LoadAssets>
+        </ThemeProvider>
+      </AuthContextProvider>
+    </ApolloProvider>
   )
 }
 
 const NavigationFlow: React.FC = () => {
+  const { signedIn } = useAuthStateContext()
+
   if (signedIn) {
     return <MainTab />
   } else {

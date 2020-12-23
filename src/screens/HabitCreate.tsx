@@ -1,7 +1,9 @@
 import React from 'react'
-import { Text, View } from 'react-native'
+import { Text } from 'react-native'
+import { Container, SectionSpacer } from '../components'
+import { MainTabNav } from '../types'
 
-const HabitCreate: React.FC = () => {
+const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = () => {
   // const { loading, error, data } = useGetExchangeRatesQuery()
   // if (loading) {
   //   return <Text>fart</Text>
@@ -12,9 +14,11 @@ const HabitCreate: React.FC = () => {
   // console.log()
 
   return (
-    <View>
-      <Text>Habit Create</Text>
-    </View>
+    <Container>
+      <SectionSpacer>
+        <Text>Habit Create</Text>
+      </SectionSpacer>
+    </Container>
   )
 }
 

@@ -12,12 +12,14 @@ const useLogin = (): ((credentials: UserCredentialsFragment) => void)[] => {
   const login = async ({
     accessToken,
     client,
-    uid
+    uid,
+    expiry
   }: UserCredentialsFragment): Promise<void> => {
     try {
       await AsyncStorage.setItem('ACCESS_TOKEN', accessToken)
       await AsyncStorage.setItem('CLIENT', client)
       await AsyncStorage.setItem('UID', uid)
+      await AsyncStorage.setItem('EXPIRY', `${expiry}`)
       dispatch({ type: 'SIGN_IN' })
     } catch (err) {
       console.log((err as Error).message)

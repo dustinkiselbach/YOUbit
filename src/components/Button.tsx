@@ -27,6 +27,7 @@ const ButtonText = styled.Text`
   font-family: 'OpenSans-Bold';
   text-transform: capitalize;
   align-self: center;
+  color: rgba(0, 0, 0, 0.75);
 `
 
 export default Button

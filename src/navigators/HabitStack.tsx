@@ -7,7 +7,7 @@ const Stack = createStackNavigator<HabitStackParamList>()
 
 const HabitStack: React.FC = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name='HabitsList' component={Habits} />
       <Stack.Screen name='HabitDetail' component={HabitDetail} />
     </Stack.Navigator>

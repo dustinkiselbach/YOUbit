@@ -1,8 +1,11 @@
+import { useApolloClient } from '@apollo/client'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useAuthDispatchContext } from '../context'
 
-const useLogin = (): (() => void)[] => {
+// have to wipe out cache
+const useLogout = (): (() => void)[] => {
   const dispatch = useAuthDispatchContext()
+  const client = useApolloClient()
 
   if (!dispatch) {
     throw new Error('dispatch is not defined')
@@ -11,6 +14,7 @@ const useLogin = (): (() => void)[] => {
   const logout = async (): Promise<void> => {
     try {
       await AsyncStorage.clear()
+      await client.cache.reset()
       dispatch({ type: 'SIGN_OUT' })
     } catch (err) {
       console.log((err as Error).message)
@@ -18,4 +22,4 @@ const useLogin = (): (() => void)[] => {
   }
   return [logout]
 }
-export default useLogin
+export default useLogout

@@ -3,9 +3,9 @@ import {
   ApolloLink,
   ApolloClient,
   InMemoryCache,
-  from
+  concat
 } from '@apollo/client'
-import { onError } from '@apollo/client/link/error'
+
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // apollo
@@ -13,13 +13,18 @@ const httpLink = new HttpLink({
   uri: 'https://damp-cove-03421.herokuapp.com/graphql'
 })
 
-const logoutLink = onError(({ networkError }) => {
-  // if (networkError.statusCode === 401) {
-  //   console.log('bad!')
-  // }
-  console.log('poop')
-  console.log(networkError)
-})
+// if you want to implement logout link we need to nest it in react component
+// to access useLogout hook which is made available by context
+// current implementation will require handling of errors for each request
+// on protected routes
+
+// const logoutLink = onError(({ networkError }) => {
+//   // if (networkError.statusCode === 401) {
+//   //   console.log('bad!')
+//   // }
+//   console.log('poop')
+//   console.log(networkError)
+// })
 
 const authMiddleware = new ApolloLink((operation, forward) => {
   // add the authorization to the headers
@@ -37,7 +42,7 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: from([authMiddleware, logoutLink, httpLink])
+  link: concat(authMiddleware, httpLink)
 })
 
 export default client

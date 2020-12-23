@@ -36,8 +36,9 @@ export const AuthContextProvider: React.FC = ({ children }) => {
   useEffect(() => {
     ;(async () => {
       try {
-        const token = await AsyncStorage.getItem('ACCESS_TOKEN')
-        if (token) {
+        const expiry = await AsyncStorage.getItem('EXPIRY')
+
+        if (expiry && parseInt(expiry) * 1000 > new Date().valueOf()) {
           dispatch({ type: 'SIGN_IN' })
         }
       } catch (err) {

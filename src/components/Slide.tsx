@@ -2,32 +2,49 @@ import React from 'react'
 import { Dimensions } from 'react-native'
 import Text from './Text'
 import styled from '../../styled-components'
+import { Feather } from '@expo/vector-icons'
 
 const { width } = Dimensions.get('window')
 
 interface SlideProps {
   title: string
-  subTitle: string
+  subtitle: string
+  icon: string
+  backgroundColor: string
+  idx: number
 }
 
-const Slide: React.FC<SlideProps> = ({ title, subTitle }) => {
+const Slide: React.FC<SlideProps> = ({
+  title,
+  subtitle,
+  icon,
+  backgroundColor,
+  idx
+}) => {
+  const textColor = idx > 1 ? 'rgba(0,0,0,0.75)' : 'white'
   return (
-    <_Slide>
+    <_Slide {...{ backgroundColor }}>
       <SlideContainer>
-        <Text variant='h2' style={{ color: 'white', marginBottom: 16 }}>
+        <Feather
+          name={icon as any}
+          size={80}
+          color={textColor}
+          style={{ marginBottom: 32 }}
+        />
+        <Text variant='h2' style={{ color: textColor, marginBottom: 16 }}>
           {title}
         </Text>
-        <Text variant='p' style={{ color: 'white', textAlign: 'center' }}>
-          {subTitle}
+        <Text variant='p' style={{ color: textColor, textAlign: 'center' }}>
+          {subtitle}
         </Text>
       </SlideContainer>
     </_Slide>
   )
 }
 
-const _Slide = styled.View`
+const _Slide = styled.View<{ backgroundColor: string }>`
   width: ${width}px;
-  background-color: ${props => props.theme.colors.colorPrimary};
+  background-color: ${props => props.backgroundColor};
 `
 
 const SlideContainer = styled.View`

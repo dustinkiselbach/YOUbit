@@ -9,6 +9,7 @@ export const myTheme: DefaultTheme = {
     colorSecondary: '#FF7600',
     colorLightGrey: '#F2F2F2',
     colorText: '#535353',
-    colorBackground: '#ffffff'
+    colorBackground: '#ffffff',
+    colorDanger: '#dc3545'
   }
 }

@@ -7,5 +7,6 @@ export default interface DefaultTheme {
     colorText: string
     colorLightGrey: string
     colorBackground: string
+    colorDanger: string
   }
 }

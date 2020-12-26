@@ -1,0 +1,5 @@
+query userCheckPasswordToken($resetPasswordToken: String!) {
+  userCheckPasswordToken(resetPasswordToken: $resetPasswordToken) {
+    ...UserCredentials
+  }
+}

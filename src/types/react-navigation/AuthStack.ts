@@ -2,10 +2,10 @@ import { RouteProp } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 
 export type AuthStackParamList = {
-  Onboarding: undefined
   Register: undefined
   Login: undefined
   ResetPassword: undefined
+  ChangePassword: undefined
 }
 
 export type AuthStackNav<RouteName extends keyof AuthStackParamList> = {

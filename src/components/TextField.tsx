@@ -11,6 +11,7 @@ interface TextFieldProps extends TextInputProps {
 const TextField: React.FC<TextFieldProps> = ({ name, label, ...props }) => {
   const [field, meta, { setValue }] = useField({ name })
   // console.log(meta)
+
   return (
     <>
       <Label>{label}</Label>
@@ -20,6 +21,7 @@ const TextField: React.FC<TextFieldProps> = ({ name, label, ...props }) => {
         onChangeText={t => setValue(t)}
         placeholder={label}
       />
+      {meta.error ? <Error>{meta.error}</Error> : null}
     </>
   )
 }
@@ -37,6 +39,12 @@ const Input = styled.TextInput`
   background-color: ${props => props.theme.colors.colorLightGrey};
   color: ${props => props.theme.colors.colorText};
   border-radius: ${props => props.theme.borderRadius};
+`
+
+const Error = styled.Text`
+  margin-top: 8px;
+  font-family: 'OpenSans-Regular';
+  color: red;
 `
 
 export default TextField

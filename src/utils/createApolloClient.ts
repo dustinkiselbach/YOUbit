@@ -1,10 +1,5 @@
-import {
-  HttpLink,
-  ApolloLink,
-  ApolloClient,
-  InMemoryCache,
-  concat
-} from '@apollo/client'
+import { HttpLink, ApolloClient, InMemoryCache } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -26,23 +21,26 @@ const httpLink = new HttpLink({
 //   console.log(networkError)
 // })
 
-const authMiddleware = new ApolloLink((operation, forward) => {
-  // add the authorization to the headers
-  operation.setContext(({ headers = {} }) => ({
+const authLink = setContext(async (_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token = await AsyncStorage.getItem('ACCESS_TOKEN')
+  const client = await AsyncStorage.getItem('CLIENT')
+  const uid = await AsyncStorage.getItem('UID')
+
+  // return the headers to the context so httpLink can read them
+  return {
     headers: {
       ...headers,
-      'access-token': AsyncStorage.getItem('ACCESS_TOKEN') || null,
-      client: AsyncStorage.getItem('CLIENT') || null,
-      uid: AsyncStorage.getItem('UID') || null
+      'access-token': token,
+      client,
+      uid
     }
-  }))
-
-  return forward(operation)
+  }
 })
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: concat(authMiddleware, httpLink)
+  link: authLink.concat(httpLink)
 })
 
 export default client

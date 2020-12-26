@@ -8,17 +8,20 @@ interface ButtonProps extends TouchableOpacityProps {
   variant?: 'secondary'
 }
 
-const Button: React.FC<ButtonProps> = ({ title, ...props }) => {
+const Button: React.FC<ButtonProps> = ({ title, variant, ...props }) => {
   return (
-    <_Button {...props}>
+    <_Button {...props} {...{ variant }}>
       <ButtonText>{title}</ButtonText>
     </_Button>
   )
 }
 
-const _Button = styled.TouchableOpacity`
+const _Button = styled.TouchableOpacity<{ variant?: 'secondary' }>`
   height: 40px;
-  background-color: ${props => props.theme.colors.colorPrimary};
+  background-color: ${props =>
+    props.variant === 'secondary'
+      ? props.theme.colors.colorSecondary
+      : props.theme.colors.colorPrimary};
   border-radius: ${props => props.theme.borderRadius};
   padding: 10px 12px;
 `
@@ -27,7 +30,7 @@ const ButtonText = styled.Text`
   font-family: 'OpenSans-Bold';
   text-transform: capitalize;
   align-self: center;
-  color: rgba(0, 0, 0, 0.75);
+  color: rgba(255, 255, 255, 0.9);
 `
 
 export default Button

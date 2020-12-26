@@ -1,6 +1,6 @@
 mutation userLogin($email: String!, $password: String!) {
   userLogin(email: $email, password: $password) {
-    authenticatable {
+    user {
       ...RegularUser
     }
     credentials {

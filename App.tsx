@@ -6,6 +6,7 @@ import { myTheme } from './src/themes/myTheme'
 import { ApolloProvider } from '@apollo/client'
 import { AuthContextProvider, useAuthStateContext } from './src/context'
 import { client } from './src/utils'
+import { Onboarding } from './src/screens'
 
 const fonts = {
   'OpenSans-Bold': require('./assets/fonts/OpenSans-Bold.ttf'),
@@ -30,7 +31,11 @@ const App: React.FC = () => {
 }
 
 const NavigationFlow: React.FC = () => {
-  const { signedIn } = useAuthStateContext()
+  const { firstTime, signedIn } = useAuthStateContext()
+
+  if (firstTime) {
+    return <Onboarding />
+  }
 
   if (signedIn) {
     return <MainTab />

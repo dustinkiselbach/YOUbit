@@ -3,7 +3,8 @@ import { View, Dimensions } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import styled from '../../styled-components'
 import { Button, Dot, Slide } from '../components'
-import { AuthStackNav } from '../types'
+
+import { useViewedOnboarding } from '../utils'
 
 const { width, height } = Dimensions.get('window')
 const slides = [
@@ -30,13 +31,13 @@ const slides = [
 ]
 //#ddf8f9
 
-const Onboarding: React.FC<AuthStackNav<'Onboarding'>> = ({ navigation }) => {
+const Onboarding: React.FC = () => {
+  const [complete] = useViewedOnboarding()
   const [scrollIndex, setScrollIndex] = useState(0)
   const ref = useRef<ScrollView>(null)
-  console.log(scrollIndex)
 
   return (
-    <ScrollView>
+    <>
       <Slides>
         <ScrollView
           horizontal
@@ -46,13 +47,14 @@ const Onboarding: React.FC<AuthStackNav<'Onboarding'>> = ({ navigation }) => {
           bounces={false}
           onScroll={e =>
             setScrollIndex(
-              Math.floor(
+              Math.round(
                 (e.nativeEvent.contentOffset.x /
                   e.nativeEvent.contentSize.width) *
                   slides.length
               )
             )
           }
+          scrollEventThrottle={16}
           ref={ref}
         >
           {slides.map(({ title, subtitle, icon, backgroundColor }, idx) => (
@@ -63,22 +65,29 @@ const Onboarding: React.FC<AuthStackNav<'Onboarding'>> = ({ navigation }) => {
           ))}
         </ScrollView>
       </Slides>
-      <Dots>
-        {slides.map((_, idx) => (
-          <Dot key={idx} {...{ scrollIndex, idx }} />
-        ))}
-      </Dots>
-      <View style={{ padding: 16 }}>
-        <Button
-          title={scrollIndex === slides.length - 1 ? 'register' : 'next'}
-          onPress={
-            scrollIndex === slides.length - 1
-              ? () => navigation.navigate('Register')
-              : () => ref.current?.scrollTo({ x: 360 * (scrollIndex + 1) })
-          }
-        />
-      </View>
-    </ScrollView>
+      <Bottom>
+        <Dots>
+          {slides.map((_, idx) => (
+            <Dot key={idx} {...{ scrollIndex, idx }} />
+          ))}
+        </Dots>
+        <View style={{ padding: 16 }}>
+          <Button
+            title={
+              scrollIndex === slides.length - 1 ? "Let's Get Started" : 'Next'
+            }
+            onPress={
+              scrollIndex === slides.length - 1
+                ? () => complete()
+                : () => ref.current?.scrollTo({ x: width * (scrollIndex + 1) })
+            }
+            variant={
+              scrollIndex === slides.length - 1 ? 'secondary' : undefined
+            }
+          />
+        </View>
+      </Bottom>
+    </>
   )
 }
 
@@ -92,6 +101,9 @@ const Dots = styled.View`
   align-items: center;
   justify-content: center;
   flex-direction: row;
+`
+const Bottom = styled.View`
+  height: ${0.2 * height}px;
 `
 
 export default Onboarding

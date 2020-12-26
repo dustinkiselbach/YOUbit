@@ -13,8 +13,11 @@ const useLogout = (): (() => void)[] => {
 
   const logout = async (): Promise<void> => {
     try {
-      await AsyncStorage.clear()
-      await client.cache.reset()
+      await AsyncStorage.removeItem('ACCESS_TOKEN')
+      await AsyncStorage.removeItem('CLIENT')
+      await AsyncStorage.removeItem('UID')
+      await AsyncStorage.removeItem('EXPIRY')
+      await client.resetStore()
       dispatch({ type: 'SIGN_OUT' })
     } catch (err) {
       console.log((err as Error).message)

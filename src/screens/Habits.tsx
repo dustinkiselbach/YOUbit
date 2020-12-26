@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Card, Container, SectionSpacer, Text } from '../components'
+
 import { HabitStackNav } from '../types'
 
 const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {

@@ -13,6 +13,7 @@ import { Formik } from 'formik'
 import { AuthStackNav } from '../types'
 import { useUserSignUpMutation } from '../generated/graphql'
 import { useLogin } from '../utils'
+import { ApolloError } from '@apollo/client'
 
 const Register: React.FC<AuthStackNav<'Register'>> = ({ navigation }) => {
   const [userSignUp] = useUserSignUpMutation()
@@ -29,17 +30,27 @@ const Register: React.FC<AuthStackNav<'Register'>> = ({ navigation }) => {
             email: '',
             password: '',
             passwordConfirmation: '',
-            confirmSuccessUrl: '',
             name: ''
           }}
-          onSubmit={async values => {
+          onSubmit={async (values, { setErrors }) => {
             try {
               const res = await userSignUp({ variables: values })
               if (res.data?.userSignUp?.credentials) {
                 login(res.data.userSignUp.credentials)
               }
             } catch (err) {
-              console.log((err as Error).message)
+              const {
+                detailed_errors: {
+                  email,
+                  name,
+                  password,
+                  password_confirmation: passwordConfirmation
+                }
+              } = (err as ApolloError).graphQLErrors[0].extensions ?? {
+                detailed_errors: null
+              }
+
+              setErrors({ email, name, password, passwordConfirmation })
             }
           }}
         >

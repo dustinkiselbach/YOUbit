@@ -11,8 +11,10 @@ import {
 } from '../components'
 import { Formik } from 'formik'
 import { AuthStackNav } from '../types'
+import { useUserSendPasswordResetMutation } from '../generated/graphql'
 
 const Login: React.FC<AuthStackNav<'ResetPassword'>> = ({ navigation }) => {
+  const [sendResetToken] = useUserSendPasswordResetMutation()
   return (
     <Container>
       <SectionSpacer>
@@ -21,8 +23,15 @@ const Login: React.FC<AuthStackNav<'ResetPassword'>> = ({ navigation }) => {
           validateOnBlur={false}
           validateOnChange={false}
           initialValues={{ email: '' }}
-          onSubmit={async values => {
-            console.log(values)
+          onSubmit={async (values, { setErrors }) => {
+            try {
+              await sendResetToken({ variables: values })
+
+              navigation.navigate('ChangePassword')
+              // redirect to change password form
+            } catch (err) {
+              setErrors({ email: "doesn't exist" })
+            }
           }}
         >
           {({ handleSubmit, isSubmitting }) => (

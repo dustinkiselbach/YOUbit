@@ -4,6 +4,7 @@ import {
   Button,
   CheckWeekFieldGroup,
   Container,
+  DatePickerField,
   RadioFieldGroup,
   SectionSpacer,
   Spacer,
@@ -26,7 +27,13 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = () => {
         <Formik
           validateOnBlur={false}
           validateOnChange={false}
-          initialValues={{ type: '', name: '', period: '', days: [] }}
+          initialValues={{
+            type: '',
+            name: '',
+            period: '',
+            days: [],
+            date: new Date()
+          }}
           onSubmit={async (values, { setErrors }) => {
             console.log(values)
           }}
@@ -66,6 +73,9 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = () => {
                   <CheckWeekFieldGroup name='days' />
                 </Spacer>
               ) : null}
+              <Spacer>
+                <DatePickerField name='date' label='Start Date' />
+              </Spacer>
               <Spacer>
                 <Button
                   title='Save'

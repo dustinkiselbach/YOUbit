@@ -149,7 +149,7 @@ export type UserUpdatePasswordPayload = {
 
 export type RegularUserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'name'>
+  & Pick<User, 'id' | 'email'>
 );
 
 export type UserCredentialsFragment = (
@@ -270,7 +270,7 @@ export type UserQuery = (
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
-  name
+  email
 }
     `;
 export const UserCredentialsFragmentDoc = gql`

@@ -1,18 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Card, Container, SectionSpacer, Text } from '../components'
+import { Container, Dates, SectionSpacer } from '../components'
 
 import { HabitStackNav } from '../types'
+import { getCurrentWeek } from '../utils'
+
+const currentWeek = getCurrentWeek()
 
 const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
+  const [day, setDay] = useState(new Date())
+
   return (
     <Container>
-      <SectionSpacer>
-        <Text variant='h1' style={{ marginBottom: 16 }}>
-          All Habits
-        </Text>
-        <Card />
-      </SectionSpacer>
+      <Dates dates={currentWeek} selected={day} changeSelected={setDay} />
+      <SectionSpacer></SectionSpacer>
     </Container>
   )
 }

@@ -79,7 +79,7 @@ const ChangePassword: React.FC<AuthStackNav<'ChangePassword'>> = () => {
             <View>
               <Spacer>
                 <TextField
-                  label='Token'
+                  label='Reset Token'
                   textContentType='oneTimeCode'
                   autoCapitalize='none'
                   name='token'

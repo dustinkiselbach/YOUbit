@@ -11,7 +11,9 @@ import { lighten } from 'polished'
 import { Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-function getIcon (route: keyof MainTabParamList): string {
+function getIcon (
+  route: keyof MainTabParamList
+): 'list' | 'plus-circle' | 'settings' | 'alert-triangle' {
   switch (route) {
     case 'Habits':
       return 'list'
@@ -67,7 +69,7 @@ const TabBar: React.FC<BottomTabBarProps<BottomTabBarOptions>> = ({
               {({ pressed }) => (
                 <TabBarItem {...{ focused, pressed }}>
                   <Feather
-                    name={icon as any}
+                    name={icon}
                     size={40}
                     color={focused || pressed ? 'black' : '#535353'}
                   />

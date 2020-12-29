@@ -14,7 +14,7 @@ interface DatePickerFieldProps {
 const DatePickerField: React.FC<DatePickerFieldProps> = ({ name, label }) => {
   const [open, setOpen] = React.useState(false)
   const [field, meta, { setValue }] = useField({ name })
-  console.log(open)
+
   return (
     <>
       <Label>{label}</Label>

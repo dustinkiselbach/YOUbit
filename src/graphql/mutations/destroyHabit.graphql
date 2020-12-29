@@ -1,0 +1,7 @@
+mutation destroyHabit($habitId: ID!) {
+  destroyHabit(habitId: $habitId) {
+    habit {
+      id
+    }
+  }
+}

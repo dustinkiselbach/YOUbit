@@ -1,27 +1,18 @@
 import { useField } from 'formik'
 import React from 'react'
 import styled from '../../styled-components'
+import { daysOfWeek } from '../utils'
 
 interface CheckWeekFieldGroupProps {
   name: string
 }
-
-const days = [
-  'sunday',
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday'
-] as const
 
 const CheckWeekFieldGroup: React.FC<CheckWeekFieldGroupProps> = ({ name }) => {
   const [field, meta, { setValue }] = useField<string[]>({ name })
 
   return (
     <_CheckWeekFieldGroup>
-      {days.map(day => {
+      {daysOfWeek.map(day => {
         const selected = field.value.includes(day)
         return (
           <CheckDay

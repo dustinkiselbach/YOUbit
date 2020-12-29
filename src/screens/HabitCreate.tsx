@@ -12,12 +12,18 @@ import {
   TextField
 } from '../components'
 import { MainTabNav } from '../types'
+import {
+  useCreateHabitMutation,
+  HabitIndexDocument,
+  HabitIndexQuery
+} from '../generated/graphql'
+import { ApolloError } from '@apollo/client'
+import { daysOfWeek, useLogout } from '../utils'
 
-// type checkbox goal limit
-// name form field
-// default every day or select which days you want to do
+const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
+  const [createHabit] = useCreateHabitMutation()
+  const [logout] = useLogout()
 
-const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = () => {
   return (
     <Container>
       <SectionSpacer>
@@ -28,21 +34,77 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = () => {
           validateOnBlur={false}
           validateOnChange={false}
           initialValues={{
-            type: '',
+            habitType: '',
             name: '',
             period: '',
-            days: [],
-            date: new Date()
+            frequency: [],
+            startDate: new Date()
           }}
-          onSubmit={async (values, { setErrors }) => {
-            console.log(values)
+          onSubmit={async (values, { setErrors, resetForm }) => {
+            try {
+              const res = await createHabit({
+                variables: {
+                  name: values.name,
+                  habitType: values.habitType,
+                  frequency:
+                    values.period === 'daily' ? ['daily'] : values.frequency,
+                  startDate: values.startDate
+                },
+                // always dependant on variables
+                // going to loop through and revalidate based on days in frequency array
+                update: (store, { data }) => {
+                  for (const day of values.period === 'daily'
+                    ? daysOfWeek
+                    : values.frequency) {
+                    const habitData = store.readQuery<HabitIndexQuery>({
+                      query: HabitIndexDocument,
+                      variables: { dayOfWeek: [day], active: true }
+                    })
+
+                    // if the query hasn't been executed no need to update
+                    if (!habitData) {
+                      continue
+                    }
+
+                    store.writeQuery({
+                      query: HabitIndexDocument,
+                      variables: { dayOfWeek: [day], active: true },
+                      data: {
+                        habitIndex: [...habitData.habitIndex, data!.createHabit]
+                      }
+                    })
+                  }
+                }
+              })
+
+              if (res.data?.createHabit?.habit.name) {
+                // @todo invalidate cache
+                resetForm()
+                navigation.navigate('Habits')
+              }
+            } catch (err) {
+              console.log((err as Error).message)
+              if (
+                (err as ApolloError).graphQLErrors[0].extensions?.code ===
+                'AUTHENTICATION ERROR'
+              ) {
+                logout()
+              }
+              const {
+                detailed_errors: { name, habitType, frequency, startDate }
+              } = (err as ApolloError).graphQLErrors[0].extensions ?? {
+                detailed_errors: null
+              }
+
+              setErrors({ name, habitType, frequency, startDate })
+            }
           }}
         >
           {({ handleSubmit, isSubmitting, values }) => (
             <>
               <Spacer>
                 <RadioFieldGroup
-                  name='type'
+                  name='habitType'
                   label='Type'
                   options={[
                     { value: 'goal', label: 'Goal' },
@@ -70,11 +132,11 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = () => {
               </Spacer>
               {values.period === 'select days' ? (
                 <Spacer>
-                  <CheckWeekFieldGroup name='days' />
+                  <CheckWeekFieldGroup name='frequency' />
                 </Spacer>
               ) : null}
               <Spacer>
-                <DatePickerField name='date' label='Start Date' />
+                <DatePickerField name='startDate' label='Start Date' />
               </Spacer>
               <Spacer>
                 <Button

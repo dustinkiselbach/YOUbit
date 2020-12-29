@@ -1,0 +1,7 @@
+query habitIndex($dayOfWeek: [String!], $active: Boolean) {
+  habitIndex(daysOfWeek: $dayOfWeek, active: $active) {
+    name
+    frequency
+    id
+  }
+}

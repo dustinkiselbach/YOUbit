@@ -1,7 +1,19 @@
-query habitIndex($dayOfWeek: [String!], $active: Boolean) {
+query habitIndex(
+  $dayOfWeek: [String!]
+  $active: Boolean
+  $selectedDate: ISO8601Date!
+) {
   habitIndex(daysOfWeek: $dayOfWeek, active: $active) {
     name
     frequency
     id
+    habitType
+    isLogged(selectedDate: $selectedDate) {
+      habitLog {
+        id
+      }
+      logged
+    }
+    startDate
   }
 }

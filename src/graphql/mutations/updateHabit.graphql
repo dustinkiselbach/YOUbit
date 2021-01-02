@@ -1,17 +1,19 @@
-mutation createHabit(
+mutation updateHabit(
   $name: String!
   $description: String
   $habitType: String
   $frequency: [String!]!
   $startDate: ISO8601Date!
+  $habitId: ID!
   $categoryName: String!
 ) {
-  createHabit(
+  updateHabit(
     name: $name
     description: $description
     habitType: $habitType
     frequency: $frequency
     startDate: $startDate
+    habitId: $habitId
     categoryName: $categoryName
   ) {
     habit {

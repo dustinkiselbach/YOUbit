@@ -1,15 +1,59 @@
 import React, { useState } from 'react'
-import { View, Text, TouchableOpacityProps } from 'react-native'
+import { TouchableOpacityProps } from 'react-native'
 import styled from '../../styled-components'
-import { Feather } from '@expo/vector-icons'
+import { Feather, FontAwesome5 } from '@expo/vector-icons'
+import {
+  HabitIndexDocument,
+  HabitIndexQuery,
+  useArchiveOrActivateHabitMutation,
+  useCreateHabitLogMutation,
+  useDestroyHabitLogMutation
+} from '../generated/graphql'
+import { daysOfWeek } from '../utils'
+import {
+  CompositeNavigationProp,
+  useNavigation
+} from '@react-navigation/native'
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
+import { HabitStackParamList, MainTabParamList } from '../types'
+import { StackNavigationProp } from '@react-navigation/stack'
+
+type HabitCardNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList, 'Habits'>,
+  StackNavigationProp<HabitStackParamList>
+>
+
+interface HabitCardAdditionalProps {
+  frequency: string[]
+  isLogged: {
+    logged: boolean
+    habitLog?: { id: string } | null
+  }
+  startDate: any
+}
 
 interface HabitCardProps extends TouchableOpacityProps {
   name: string
   id: string
+  habitType: string
+  day: Date
+  isLogged?: boolean
+  rest: HabitCardAdditionalProps
 }
 
-const HabitCard: React.FC<HabitCardProps> = ({ name, id, ...props }) => {
+const HabitCard: React.FC<HabitCardProps> = ({
+  name,
+  habitType,
+  id,
+  day,
+  rest: { isLogged, frequency, startDate },
+  ...props
+}) => {
   const [showMore, setShowMore] = useState(false)
+  const navigation = useNavigation<HabitCardNavigationProp>()
+  const [createHabitLog] = useCreateHabitLogMutation()
+  const [archiveOrActivateHabit] = useArchiveOrActivateHabitMutation()
+  const [destroyHabitLog] = useDestroyHabitLogMutation()
 
   if (showMore) {
     return (
@@ -17,11 +61,64 @@ const HabitCard: React.FC<HabitCardProps> = ({ name, id, ...props }) => {
         <Close onPress={() => setShowMore(false)}>
           <Feather name='x' size={24} color='#535353' />
         </Close>
-        <HabitCardButton>
+        <HabitCardButton
+          onPress={() => {
+            navigation.navigate('HabitUpdate', {
+              name,
+              habitType,
+              frequency,
+              startDate,
+              id
+            })
+            setShowMore(false)
+          }}
+        >
           <HabitCardLabel>Edit</HabitCardLabel>
         </HabitCardButton>
         <HabitCardButton>
-          <HabitCardLabel>Archive</HabitCardLabel>
+          <HabitCardLabel
+            onPress={async () => {
+              try {
+                await archiveOrActivateHabit({
+                  variables: {
+                    habitId: id,
+                    active: false
+                  },
+                  update: (store, { data }) => {
+                    const habitData = store.readQuery<HabitIndexQuery>({
+                      query: HabitIndexDocument,
+                      variables: {
+                        dayOfWeek: [daysOfWeek[day.getDay()]],
+                        active: true,
+                        selectedDate: day.toISOString().split('T')[0]
+                      }
+                    })
+
+                    store.evict({
+                      fieldName: 'habitIndex',
+                      broadcast: false
+                    })
+                    store.writeQuery<HabitIndexQuery>({
+                      query: HabitIndexDocument,
+                      variables: {
+                        dayOfWeek: [daysOfWeek[day.getDay()]],
+                        active: true
+                      },
+                      data: {
+                        habitIndex: habitData!.habitIndex.filter(
+                          habit => habit.id !== data?.updateHabit?.habit.id
+                        )
+                      }
+                    })
+                  }
+                })
+              } catch (err) {
+                console.log((err as Error).message)
+              }
+            }}
+          >
+            Archive
+          </HabitCardLabel>
         </HabitCardButton>
       </HabitMore>
     )
@@ -29,7 +126,56 @@ const HabitCard: React.FC<HabitCardProps> = ({ name, id, ...props }) => {
 
   return (
     <_HabitCard {...props}>
-      <HabitCompleted></HabitCompleted>
+      <HabitCompleted
+        isLogged={isLogged.logged}
+        onPress={async () => {
+          if (isLogged.logged) {
+            try {
+              await destroyHabitLog({
+                variables: { habitLogId: isLogged.habitLog?.id || '' },
+                refetchQueries: [
+                  {
+                    query: HabitIndexDocument,
+                    variables: {
+                      dayOfWeek: [daysOfWeek[day.getDay()]],
+                      active: true,
+                      selectedDate: day.toISOString().split('T')[0]
+                    }
+                  }
+                ]
+              })
+            } catch (err) {
+              console.log((err as Error).message)
+            }
+          } else {
+            try {
+              await createHabitLog({
+                variables: {
+                  habitId: id,
+                  habitType,
+                  loggedDate: day.toISOString()
+                },
+                refetchQueries: [
+                  {
+                    query: HabitIndexDocument,
+                    variables: {
+                      dayOfWeek: [daysOfWeek[day.getDay()]],
+                      active: true,
+                      selectedDate: day.toISOString().split('T')[0]
+                    }
+                  }
+                ]
+              })
+            } catch (err) {
+              console.log((err as Error).message)
+            }
+          }
+        }}
+      >
+        {isLogged.logged ? (
+          <FontAwesome5 name='check' size={14} color='rgba(255,255,255,0.9)' />
+        ) : null}
+      </HabitCompleted>
       <HabitCardLabel>{name}</HabitCardLabel>
       <More onPress={() => setShowMore(true)}>
         <Feather name='more-vertical' size={24} color='#535353' />
@@ -66,7 +212,7 @@ const HabitCardButton = styled.TouchableOpacity`
   padding: 8px;
 `
 
-const HabitCompleted = styled.TouchableOpacity`
+const HabitCompleted = styled.TouchableOpacity<{ isLogged?: boolean }>`
   width: 33px;
   height: 33px;
   border-radius: 33px;
@@ -74,6 +220,8 @@ const HabitCompleted = styled.TouchableOpacity`
   margin-right: 16px;
   align-items: center;
   justify-content: center;
+  background-color: ${({ isLogged, theme }) =>
+    isLogged ? theme.colors.colorPrimary : 'transparent'};
 `
 const More = styled.TouchableOpacity`
   margin-left: auto;

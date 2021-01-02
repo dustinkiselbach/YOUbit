@@ -1,0 +1,15 @@
+mutation createHabitLog(
+  $habitId: ID!
+  $habitType: String!
+  $loggedDate: ISO8601Date!
+) {
+  createHabitLog(
+    habitId: $habitId
+    habitType: $habitType
+    loggedDate: $loggedDate
+  ) {
+    habitLog {
+      id
+    }
+  }
+}

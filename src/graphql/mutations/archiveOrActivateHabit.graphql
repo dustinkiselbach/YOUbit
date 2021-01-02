@@ -1,0 +1,7 @@
+mutation archiveOrActivateHabit($habitId: ID!, $active: Boolean!) {
+  updateHabit(habitId: $habitId, active: $active) {
+    habit {
+      id
+    }
+  }
+}

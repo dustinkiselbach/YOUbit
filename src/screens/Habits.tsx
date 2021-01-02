@@ -1,20 +1,55 @@
 import React, { useState } from 'react'
+import { ActivityIndicator } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Container, Dates, HabitCard, SectionSpacer } from '../components'
+import { Container, Dates, HabitCard, SectionSpacer, Text } from '../components'
 import { useHabitIndexQuery } from '../generated/graphql'
 import { HabitStackNav } from '../types'
-import { daysOfWeek, getCurrentWeek } from '../utils'
+import { daysOfWeek, getCurrentWeek, useLogout } from '../utils'
 
 const currentWeek = getCurrentWeek()
 
 const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
+  const [logout] = useLogout()
   const [day, setDay] = useState(new Date())
   const { data, error, loading } = useHabitIndexQuery({
-    variables: { dayOfWeek: [daysOfWeek[day.getDay()]], active: true }
+    variables: {
+      dayOfWeek: [daysOfWeek[day.getDay()]],
+      active: true,
+      selectedDate: day.toISOString().split('T')[0]
+    }
   })
 
   if (error) {
-    console.log(error)
+    logout()
+  }
+
+  const completedActivities = data?.habitIndex.filter(
+    ({ isLogged: { logged } }) => logged
+  )
+  const notCompletedActivities = data?.habitIndex.filter(
+    ({ isLogged: { logged } }) => !logged
+  )
+
+  let allActivities: JSX.Element | null = null
+
+  if (completedActivities && notCompletedActivities) {
+    allActivities = (
+      <>
+        {notCompletedActivities.map(({ name, id, habitType, ...rest }) => (
+          <HabitCard key={id} {...{ name, id, habitType, day, rest }} />
+        ))}
+        {completedActivities.length ? (
+          <>
+            <Text variant='h4' style={{ marginBottom: 8 }}>
+              Completed
+            </Text>
+            {completedActivities.map(({ name, id, habitType, ...rest }) => (
+              <HabitCard key={id} {...{ name, id, habitType, day, rest }} />
+            ))}
+          </>
+        ) : null}
+      </>
+    )
   }
 
   return (
@@ -22,11 +57,11 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
       <Dates dates={currentWeek} selected={day} changeSelected={setDay} />
       <ScrollView>
         <SectionSpacer>
-          {data
-            ? data.habitIndex.map(({ name, id }) => (
-                <HabitCard key={id} {...{ name, id }} />
-              ))
-            : null}
+          {loading ? (
+            <ActivityIndicator size='large' color='#00C2CB' />
+          ) : (
+            allActivities
+          )}
         </SectionSpacer>
       </ScrollView>
     </Container>

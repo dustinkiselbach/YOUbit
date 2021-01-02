@@ -1,106 +1,69 @@
+import { ApolloError } from '@apollo/client'
 import { Formik } from 'formik'
 import React from 'react'
+
 import {
-  Button,
-  CheckWeekFieldGroup,
   Container,
-  DatePickerField,
-  RadioFieldGroup,
   SectionSpacer,
   Spacer,
+  RadioFieldGroup,
+  TextField,
+  CheckWeekFieldGroup,
+  DatePickerField,
   Text,
-  TextField
+  Button
 } from '../components'
-import { MainTabNav } from '../types'
-import {
-  useCreateHabitMutation,
-  HabitIndexDocument,
-  HabitIndexQuery
-} from '../generated/graphql'
-import { ApolloError } from '@apollo/client'
-import { daysOfWeek, getCurrentWeek, useLogout } from '../utils'
+import { useUpdateHabitMutation } from '../generated/graphql'
+import { HabitStackNav } from '../types'
+import { useLogout } from '../utils'
 
-const week = getCurrentWeek()
-const getIndexOfDay = (day: typeof daysOfWeek[number]): number => {
-  return daysOfWeek.indexOf(day)
-}
-
-const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
-  const [createHabit] = useCreateHabitMutation()
+const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
+  route,
+  navigation
+}) => {
+  const [updateHabit] = useUpdateHabitMutation()
   const [logout] = useLogout()
-
   return (
     <Container>
       <SectionSpacer>
         <Text variant='h1' style={{ marginBottom: 16 }}>
-          Add Habit
+          Update Habit
         </Text>
         <Formik
+          enableReinitialize
           validateOnBlur={false}
           validateOnChange={false}
           initialValues={{
-            habitType: '',
-            name: '',
-            period: '',
-            frequency: [],
-            startDate: new Date()
+            habitType: route.params.habitType,
+            name: route.params.name,
+            period:
+              route.params.frequency[0] === 'daily' ? 'daily' : 'select days',
+            frequency:
+              route.params.frequency[0] !== 'daily'
+                ? route.params.frequency
+                : [],
+            startDate: new Date(route.params.startDate)
           }}
-          onSubmit={async (values, { setErrors, resetForm }) => {
+          onSubmit={async (values, { setErrors }) => {
             try {
-              const res = await createHabit({
+              const res = await updateHabit({
                 variables: {
+                  habitId: route.params.id,
                   name: values.name,
                   habitType: values.habitType,
                   frequency:
                     values.period === 'daily' ? ['daily'] : values.frequency,
                   startDate: values.startDate,
-                  // @todo allow categories
                   categoryName: 'fart'
                 },
-                // always dependant on variables
-                // going to loop through and revalidate based on days in frequency array
-                update: (store, { data }) => {
-                  for (const day of values.period === 'daily'
-                    ? daysOfWeek
-                    : values.frequency) {
-                    const habitData = store.readQuery<HabitIndexQuery>({
-                      query: HabitIndexDocument,
-                      variables: {
-                        dayOfWeek: [day],
-                        active: true,
-                        selectedDate: week[getIndexOfDay(day)]
-                          .toISOString()
-                          .split('T')[0]
-                      }
-                    })
-
-                    // if the query hasn't been executed no need to update
-                    if (!habitData) {
-                      continue
-                    }
-
-                    store.writeQuery({
-                      query: HabitIndexDocument,
-                      variables: {
-                        dayOfWeek: [day],
-                        active: true,
-                        selectedDate: week[getIndexOfDay(day)]
-                          .toISOString()
-                          .split('T')[0]
-                      },
-                      data: {
-                        habitIndex: [...habitData.habitIndex, data!.createHabit]
-                      }
-                    })
-                  }
+                // @todo fix cache when changing days
+                update: async store => {
+                  await store.reset()
                 }
               })
 
-              if (res.data?.createHabit?.habit.name) {
-                // @todo invalidate cache
-
-                resetForm()
-                navigation.navigate('Habits')
+              if (res.data?.updateHabit?.habit.name) {
+                navigation.navigate('HabitsList')
               }
             } catch (err) {
               console.log((err as Error).message)
@@ -173,4 +136,4 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
   )
 }
 
-export default HabitCreate
+export default HabitUpdate

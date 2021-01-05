@@ -1,0 +1,6 @@
+query archivedHabits($dayOfWeek: [String!], $active: Boolean) {
+  habitIndex(daysOfWeek: $dayOfWeek, active: $active) {
+    name
+    id
+  }
+}

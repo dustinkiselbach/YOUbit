@@ -15,5 +15,11 @@ query habitIndex(
       logged
     }
     startDate
+    longestStreak {
+      habitStreak
+    }
+    currentStreak(selectedDate: $selectedDate) {
+      habitStreak
+    }
   }
 }

@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 function getIcon (
   route: keyof MainTabParamList
-): 'list' | 'plus-circle' | 'settings' | 'alert-triangle' {
+): 'list' | 'plus-circle' | 'settings' | 'alert-triangle' | 'archive' {
   switch (route) {
     case 'Habits':
       return 'list'
@@ -21,6 +21,8 @@ function getIcon (
       return 'plus-circle'
     case 'Settings':
       return 'settings'
+    case 'HabitArchive':
+      return 'archive'
     default:
       return 'alert-triangle'
   }

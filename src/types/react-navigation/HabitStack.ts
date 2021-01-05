@@ -1,18 +1,24 @@
 import { RouteProp } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 
-type UpdateHabitProps = {
-  name: string
-  habitType: string
+type HabitDetailAndUpdateProps = {
   id: string
-  frequency: string[]
-  startDate: any
+  dateString: string
+  dayOfWeek: (
+    | 'sunday'
+    | 'monday'
+    | 'tuesday'
+    | 'wednesday'
+    | 'thursday'
+    | 'friday'
+    | 'saturday'
+  )[]
 }
 
 export type HabitStackParamList = {
   HabitsList: undefined
-  HabitDetail: undefined
-  HabitUpdate: UpdateHabitProps
+  HabitDetail: HabitDetailAndUpdateProps
+  HabitUpdate: HabitDetailAndUpdateProps
 }
 
 export type HabitStackNav<RouteName extends keyof HabitStackParamList> = {

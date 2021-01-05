@@ -541,6 +541,20 @@ export type UserUpdatePasswordMutation = (
   )> }
 );
 
+export type ArchivedHabitsQueryVariables = Exact<{
+  dayOfWeek?: Maybe<Array<Scalars['String']>>;
+  active?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type ArchivedHabitsQuery = (
+  { __typename?: 'Query' }
+  & { habitIndex: Array<(
+    { __typename?: 'Habit' }
+    & Pick<Habit, 'name' | 'id'>
+  )> }
+);
+
 export type UserCheckPasswordTokenQueryVariables = Exact<{
   resetPasswordToken: Scalars['String'];
 }>;
@@ -573,7 +587,13 @@ export type HabitIndexQuery = (
         { __typename?: 'HabitLog' }
         & Pick<HabitLog, 'id'>
       )> }
-    ) }
+    ), longestStreak?: Maybe<(
+      { __typename?: 'Streak' }
+      & Pick<Streak, 'habitStreak'>
+    )>, currentStreak?: Maybe<(
+      { __typename?: 'Streak' }
+      & Pick<Streak, 'habitStreak'>
+    )> }
   )> }
 );
 
@@ -1031,6 +1051,41 @@ export function useUserUpdatePasswordMutation(baseOptions?: Apollo.MutationHookO
 export type UserUpdatePasswordMutationHookResult = ReturnType<typeof useUserUpdatePasswordMutation>;
 export type UserUpdatePasswordMutationResult = Apollo.MutationResult<UserUpdatePasswordMutation>;
 export type UserUpdatePasswordMutationOptions = Apollo.BaseMutationOptions<UserUpdatePasswordMutation, UserUpdatePasswordMutationVariables>;
+export const ArchivedHabitsDocument = gql`
+    query archivedHabits($dayOfWeek: [String!], $active: Boolean) {
+  habitIndex(daysOfWeek: $dayOfWeek, active: $active) {
+    name
+    id
+  }
+}
+    `;
+
+/**
+ * __useArchivedHabitsQuery__
+ *
+ * To run a query within a React component, call `useArchivedHabitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useArchivedHabitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useArchivedHabitsQuery({
+ *   variables: {
+ *      dayOfWeek: // value for 'dayOfWeek'
+ *      active: // value for 'active'
+ *   },
+ * });
+ */
+export function useArchivedHabitsQuery(baseOptions?: Apollo.QueryHookOptions<ArchivedHabitsQuery, ArchivedHabitsQueryVariables>) {
+        return Apollo.useQuery<ArchivedHabitsQuery, ArchivedHabitsQueryVariables>(ArchivedHabitsDocument, baseOptions);
+      }
+export function useArchivedHabitsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ArchivedHabitsQuery, ArchivedHabitsQueryVariables>) {
+          return Apollo.useLazyQuery<ArchivedHabitsQuery, ArchivedHabitsQueryVariables>(ArchivedHabitsDocument, baseOptions);
+        }
+export type ArchivedHabitsQueryHookResult = ReturnType<typeof useArchivedHabitsQuery>;
+export type ArchivedHabitsLazyQueryHookResult = ReturnType<typeof useArchivedHabitsLazyQuery>;
+export type ArchivedHabitsQueryResult = Apollo.QueryResult<ArchivedHabitsQuery, ArchivedHabitsQueryVariables>;
 export const UserCheckPasswordTokenDocument = gql`
     query userCheckPasswordToken($resetPasswordToken: String!) {
   userCheckPasswordToken(resetPasswordToken: $resetPasswordToken) {
@@ -1078,6 +1133,12 @@ export const HabitIndexDocument = gql`
       logged
     }
     startDate
+    longestStreak {
+      habitStreak
+    }
+    currentStreak(selectedDate: $selectedDate) {
+      habitStreak
+    }
   }
 }
     `;

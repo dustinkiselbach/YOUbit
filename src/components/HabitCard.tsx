@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { TouchableOpacityProps } from 'react-native'
 import styled from '../../styled-components'
 import { Feather, FontAwesome5 } from '@expo/vector-icons'
+import { isFuture } from 'date-fns'
 import {
   HabitIndexDocument,
   HabitIndexQuery,
@@ -17,6 +18,7 @@ import {
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
 import { HabitStackParamList, MainTabParamList } from '../types'
 import { StackNavigationProp } from '@react-navigation/stack'
+import HabitCompleted from './HabitCompleted'
 
 type HabitCardNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Habits'>,
@@ -29,6 +31,7 @@ interface HabitCardAdditionalProps {
     logged: boolean
     habitLog?: { id: string } | null
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   startDate: any
 }
 
@@ -46,13 +49,17 @@ const HabitCard: React.FC<HabitCardProps> = ({
   habitType,
   id,
   day,
-  rest: { isLogged, frequency, startDate },
+  rest: { isLogged, frequency },
   ...props
 }) => {
+  const future = isFuture(day)
+  const dateString = day.toISOString().split('T')[0]
+  const dayOfWeek = [daysOfWeek[day.getDay()]]
+
   const [showMore, setShowMore] = useState(false)
   const navigation = useNavigation<HabitCardNavigationProp>()
-  const [createHabitLog] = useCreateHabitLogMutation()
   const [archiveOrActivateHabit] = useArchiveOrActivateHabitMutation()
+  const [createHabitLog] = useCreateHabitLogMutation()
   const [destroyHabitLog] = useDestroyHabitLogMutation()
 
   if (showMore) {
@@ -64,11 +71,9 @@ const HabitCard: React.FC<HabitCardProps> = ({
         <HabitCardButton
           onPress={() => {
             navigation.navigate('HabitUpdate', {
-              name,
-              habitType,
-              frequency,
-              startDate,
-              id
+              id,
+              dateString,
+              dayOfWeek
             })
             setShowMore(false)
           }}
@@ -94,6 +99,11 @@ const HabitCard: React.FC<HabitCardProps> = ({
                       }
                     })
 
+                    if (!habitData) {
+                      // habitData is not cached for some reason
+                      return
+                    }
+
                     store.evict({
                       fieldName: 'habitIndex',
                       broadcast: false
@@ -105,7 +115,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
                         active: true
                       },
                       data: {
-                        habitIndex: habitData!.habitIndex.filter(
+                        habitIndex: habitData.habitIndex.filter(
                           habit => habit.id !== data?.updateHabit?.habit.id
                         )
                       }
@@ -125,10 +135,23 @@ const HabitCard: React.FC<HabitCardProps> = ({
   }
 
   return (
-    <_HabitCard {...props}>
+    <_HabitCard
+      {...props}
+      onPress={() =>
+        navigation.navigate('HabitDetail', {
+          id,
+          dateString,
+          dayOfWeek
+        })
+      }
+    >
       <HabitCompleted
         isLogged={isLogged.logged}
+        future={future}
         onPress={async () => {
+          if (future) {
+            return
+          }
           if (isLogged.logged) {
             try {
               await destroyHabitLog({
@@ -137,9 +160,9 @@ const HabitCard: React.FC<HabitCardProps> = ({
                   {
                     query: HabitIndexDocument,
                     variables: {
-                      dayOfWeek: [daysOfWeek[day.getDay()]],
+                      dayOfWeek,
                       active: true,
-                      selectedDate: day.toISOString().split('T')[0]
+                      selectedDate: dateString
                     }
                   }
                 ]
@@ -153,15 +176,15 @@ const HabitCard: React.FC<HabitCardProps> = ({
                 variables: {
                   habitId: id,
                   habitType,
-                  loggedDate: day.toISOString()
+                  loggedDate: dateString
                 },
                 refetchQueries: [
                   {
                     query: HabitIndexDocument,
                     variables: {
-                      dayOfWeek: [daysOfWeek[day.getDay()]],
+                      dayOfWeek,
                       active: true,
-                      selectedDate: day.toISOString().split('T')[0]
+                      selectedDate: dateString
                     }
                   }
                 ]
@@ -176,7 +199,13 @@ const HabitCard: React.FC<HabitCardProps> = ({
           <FontAwesome5 name='check' size={14} color='rgba(255,255,255,0.9)' />
         ) : null}
       </HabitCompleted>
-      <HabitCardLabel>{name}</HabitCardLabel>
+      <HabitCardText>
+        <HabitCardLabel>{name}</HabitCardLabel>
+        <HabitCardInfo>
+          {habitType} - {frequency.length > 1 ? 'selected days' : frequency[0]}
+        </HabitCardInfo>
+      </HabitCardText>
+
       <More onPress={() => setShowMore(true)}>
         <Feather name='more-vertical' size={24} color='#535353' />
       </More>
@@ -202,9 +231,17 @@ const HabitMore = styled.View`
   position: relative;
 `
 
+const HabitCardText = styled.View``
+
 const HabitCardLabel = styled.Text`
   font-size: 16px;
   font-family: 'OpenSans-Bold';
+  color: ${({ theme }) => theme.colors.colorText};
+`
+
+const HabitCardInfo = styled.Text`
+  font-size: 16px;
+  font-family: 'OpenSans-Regular';
   color: ${({ theme }) => theme.colors.colorText};
 `
 
@@ -212,17 +249,6 @@ const HabitCardButton = styled.TouchableOpacity`
   padding: 8px;
 `
 
-const HabitCompleted = styled.TouchableOpacity<{ isLogged?: boolean }>`
-  width: 33px;
-  height: 33px;
-  border-radius: 33px;
-  border: 3px solid ${({ theme }) => theme.colors.colorText};
-  margin-right: 16px;
-  align-items: center;
-  justify-content: center;
-  background-color: ${({ isLogged, theme }) =>
-    isLogged ? theme.colors.colorPrimary : 'transparent'};
-`
 const More = styled.TouchableOpacity`
   margin-left: auto;
 

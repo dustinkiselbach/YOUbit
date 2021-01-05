@@ -2,6 +2,30 @@ import { HttpLink, ApolloClient, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { persistCache, AsyncStorageWrapper } from 'apollo3-cache-persist'
+
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        habitIndex: {
+          merge (_, incoming) {
+            return incoming
+          }
+        }
+      }
+    }
+  }
+})
+
+const setUpAsyncCache = async (): Promise<void> => {
+  await persistCache({
+    cache,
+    storage: new AsyncStorageWrapper(AsyncStorage)
+  })
+}
+
+setUpAsyncCache()
 
 // apollo
 const httpLink = new HttpLink({
@@ -39,7 +63,7 @@ const authLink = setContext(async (_, { headers }) => {
 })
 
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache,
   link: authLink.concat(httpLink)
 })
 

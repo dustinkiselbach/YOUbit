@@ -5,6 +5,7 @@ export type MainTabParamList = {
   Habits: undefined
   HabitCreate: undefined
   Settings: undefined
+  HabitArchive: undefined
 }
 
 export type MainTabNav<RouteName extends keyof MainTabParamList> = {

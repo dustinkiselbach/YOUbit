@@ -13,16 +13,39 @@ import {
   Text,
   Button
 } from '../components'
-import { useUpdateHabitMutation } from '../generated/graphql'
+import {
+  useHabitIndexQuery,
+  useUpdateHabitMutation
+} from '../generated/graphql'
 import { HabitStackNav } from '../types'
 import { useLogout } from '../utils'
 
 const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
-  route,
+  route: {
+    params: { id, dateString, dayOfWeek }
+  },
   navigation
 }) => {
+  const { data, error } = useHabitIndexQuery({
+    variables: {
+      dayOfWeek: dayOfWeek,
+      active: true,
+      selectedDate: dateString
+    },
+    // @todo seems to break sometimes needs more testing
+    fetchPolicy: 'cache-and-network'
+  })
   const [updateHabit] = useUpdateHabitMutation()
   const [logout] = useLogout()
+
+  const habit = data?.habitIndex.filter(habit => habit.id === id)
+
+  if (!habit || error) {
+    return <Text variant='h3'>The Specified habit was not found</Text>
+  }
+
+  const { name, frequency, habitType, startDate } = habit[0]
+
   return (
     <Container>
       <SectionSpacer>
@@ -34,21 +57,17 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
           validateOnBlur={false}
           validateOnChange={false}
           initialValues={{
-            habitType: route.params.habitType,
-            name: route.params.name,
-            period:
-              route.params.frequency[0] === 'daily' ? 'daily' : 'select days',
-            frequency:
-              route.params.frequency[0] !== 'daily'
-                ? route.params.frequency
-                : [],
-            startDate: new Date(route.params.startDate)
+            habitType: habitType,
+            name: name,
+            period: frequency[0] === 'daily' ? 'daily' : 'select days',
+            frequency: frequency[0] !== 'daily' ? frequency : [],
+            startDate: new Date(startDate)
           }}
           onSubmit={async (values, { setErrors }) => {
             try {
               const res = await updateHabit({
                 variables: {
-                  habitId: route.params.id,
+                  habitId: id,
                   name: values.name,
                   habitType: values.habitType,
                   frequency:

@@ -60,6 +60,9 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                 // always dependant on variables
                 // going to loop through and revalidate based on days in frequency array
                 update: (store, { data }) => {
+                  if (!data) {
+                    throw new Error('habit has not been created')
+                  }
                   for (const day of values.period === 'daily'
                     ? daysOfWeek
                     : values.frequency) {
@@ -89,7 +92,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                           .split('T')[0]
                       },
                       data: {
-                        habitIndex: [...habitData.habitIndex, data!.createHabit]
+                        habitIndex: [...habitData.habitIndex, data.createHabit]
                       }
                     })
                   }

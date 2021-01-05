@@ -1,6 +1,6 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { HabitCreate, Settings } from '../screens'
+import { HabitArchive, HabitCreate, Settings } from '../screens'
 import HabitStack from './HabitStack'
 import { MainTabParamList } from '../types'
 import { TabBar } from '../components'
@@ -13,6 +13,7 @@ const MainTab: React.FC = () => {
       <Tab.Screen name='Habits' component={HabitStack} />
       <Tab.Screen name='HabitCreate' component={HabitCreate} />
       <Tab.Screen name='Settings' component={Settings} />
+      <Tab.Screen name='HabitArchive' component={HabitArchive} />
     </Tab.Navigator>
   )
 }

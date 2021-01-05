@@ -32,6 +32,8 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
 
   let allActivities: JSX.Element | null = null
 
+  // @todo convert to FlatList
+
   if (completedActivities && notCompletedActivities) {
     allActivities = (
       <>

@@ -8,6 +8,7 @@ query habitIndex(
     frequency
     id
     habitType
+    category
     isLogged(selectedDate: $selectedDate) {
       habitLog {
         id

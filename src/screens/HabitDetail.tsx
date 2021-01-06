@@ -48,7 +48,7 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
   } = habit[0]
 
   return (
-    <Container>
+    <Container notSafe>
       <_HabitDetail>
         <HabitDetailTop>
           <Text variant='h1'>{name}</Text>

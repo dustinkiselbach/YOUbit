@@ -31,9 +31,8 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
       dayOfWeek: dayOfWeek,
       active: true,
       selectedDate: dateString
-    },
+    }
     // @todo seems to break sometimes needs more testing
-    fetchPolicy: 'cache-and-network'
   })
   const [updateHabit] = useUpdateHabitMutation()
   const [logout] = useLogout()
@@ -44,10 +43,15 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
     return <Text variant='h3'>The Specified habit was not found</Text>
   }
 
-  const { name, frequency, habitType, startDate } = habit[0]
+  const { name, frequency, habitType, startDate } = habit[0] ?? {
+    name: null,
+    frequency: null,
+    habitType: null,
+    startDate: null
+  }
 
   return (
-    <Container>
+    <Container notSafe>
       <SectionSpacer>
         <Text variant='h1' style={{ marginBottom: 16 }}>
           Update Habit
@@ -93,7 +97,12 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
                 logout()
               }
               const {
-                detailed_errors: { name, habitType, frequency, startDate }
+                detailed_errors: {
+                  name,
+                  habit_type: habitType,
+                  frequency,
+                  start_date: startDate
+                }
               } = (err as ApolloError).graphQLErrors[0].extensions ?? {
                 detailed_errors: null
               }

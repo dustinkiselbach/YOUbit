@@ -555,6 +555,17 @@ export type ArchivedHabitsQuery = (
   )> }
 );
 
+export type CategoriesIndexQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CategoriesIndexQuery = (
+  { __typename?: 'Query' }
+  & { categoriesIndex: Array<(
+    { __typename?: 'Category' }
+    & Pick<Category, 'id' | 'name'>
+  )> }
+);
+
 export type UserCheckPasswordTokenQueryVariables = Exact<{
   resetPasswordToken: Scalars['String'];
 }>;
@@ -1086,6 +1097,39 @@ export function useArchivedHabitsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type ArchivedHabitsQueryHookResult = ReturnType<typeof useArchivedHabitsQuery>;
 export type ArchivedHabitsLazyQueryHookResult = ReturnType<typeof useArchivedHabitsLazyQuery>;
 export type ArchivedHabitsQueryResult = Apollo.QueryResult<ArchivedHabitsQuery, ArchivedHabitsQueryVariables>;
+export const CategoriesIndexDocument = gql`
+    query categoriesIndex {
+  categoriesIndex {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useCategoriesIndexQuery__
+ *
+ * To run a query within a React component, call `useCategoriesIndexQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCategoriesIndexQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCategoriesIndexQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCategoriesIndexQuery(baseOptions?: Apollo.QueryHookOptions<CategoriesIndexQuery, CategoriesIndexQueryVariables>) {
+        return Apollo.useQuery<CategoriesIndexQuery, CategoriesIndexQueryVariables>(CategoriesIndexDocument, baseOptions);
+      }
+export function useCategoriesIndexLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CategoriesIndexQuery, CategoriesIndexQueryVariables>) {
+          return Apollo.useLazyQuery<CategoriesIndexQuery, CategoriesIndexQueryVariables>(CategoriesIndexDocument, baseOptions);
+        }
+export type CategoriesIndexQueryHookResult = ReturnType<typeof useCategoriesIndexQuery>;
+export type CategoriesIndexLazyQueryHookResult = ReturnType<typeof useCategoriesIndexLazyQuery>;
+export type CategoriesIndexQueryResult = Apollo.QueryResult<CategoriesIndexQuery, CategoriesIndexQueryVariables>;
 export const UserCheckPasswordTokenDocument = gql`
     query userCheckPasswordToken($resetPasswordToken: String!) {
   userCheckPasswordToken(resetPasswordToken: $resetPasswordToken) {

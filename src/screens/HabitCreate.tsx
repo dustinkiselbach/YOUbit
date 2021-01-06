@@ -15,7 +15,8 @@ import { MainTabNav } from '../types'
 import {
   useCreateHabitMutation,
   HabitIndexDocument,
-  HabitIndexQuery
+  HabitIndexQuery,
+  useCategoriesIndexQuery
 } from '../generated/graphql'
 import { ApolloError } from '@apollo/client'
 import { daysOfWeek, getCurrentWeek, useLogout } from '../utils'
@@ -26,8 +27,13 @@ const getIndexOfDay = (day: typeof daysOfWeek[number]): number => {
 }
 
 const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
+  const { data } = useCategoriesIndexQuery()
   const [createHabit] = useCreateHabitMutation()
   const [logout] = useLogout()
+
+  data?.categoriesIndex.map((category, idx) =>
+    console.log(`index: ${idx}, name:${category.name} id:${category.id}`)
+  )
 
   return (
     <Container>
@@ -63,6 +69,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                   if (!data) {
                     throw new Error('habit has not been created')
                   }
+                  console.log(values.frequency)
                   for (const day of values.period === 'daily'
                     ? daysOfWeek
                     : values.frequency) {
@@ -91,7 +98,9 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                           .toISOString()
                           .split('T')[0]
                       },
+                      // see if this works lol
                       data: {
+                        ...habitData,
                         habitIndex: [...habitData.habitIndex, data.createHabit]
                       }
                     })
@@ -106,7 +115,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                 navigation.navigate('Habits')
               }
             } catch (err) {
-              console.log((err as Error).message)
+              console.log((err as ApolloError).graphQLErrors)
               if (
                 (err as ApolloError).graphQLErrors[0].extensions?.code ===
                 'AUTHENTICATION ERROR'
@@ -114,7 +123,12 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                 logout()
               }
               const {
-                detailed_errors: { name, habitType, frequency, startDate }
+                detailed_errors: {
+                  name,
+                  habit_type: habitType,
+                  frequency,
+                  startDate
+                }
               } = (err as ApolloError).graphQLErrors[0].extensions ?? {
                 detailed_errors: null
               }

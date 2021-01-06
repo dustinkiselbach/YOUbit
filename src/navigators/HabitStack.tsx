@@ -7,8 +7,17 @@ const Stack = createStackNavigator<HabitStackParamList>()
 
 const HabitStack: React.FC = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='HabitsList' component={Habits} />
+    <Stack.Navigator
+      screenOptions={{
+        title: '',
+        headerStyle: { backgroundColor: 'white', elevation: 0 }
+      }}
+    >
+      <Stack.Screen
+        name='HabitsList'
+        component={Habits}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name='HabitDetail' component={HabitDetail} />
       <Stack.Screen name='HabitUpdate' component={HabitUpdate} />
     </Stack.Navigator>

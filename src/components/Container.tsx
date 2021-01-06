@@ -2,14 +2,26 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import styled from '../../styled-components'
 
-const Container: React.FC = ({ children }) => {
-  return (
-    <Background>
-      <SafeAreaView>
+interface ContainerProps {
+  notSafe?: boolean
+}
+
+const Container: React.FC<ContainerProps> = ({ notSafe, children }) => {
+  if (notSafe) {
+    return (
+      <Background>
         <_Container>{children}</_Container>
-      </SafeAreaView>
-    </Background>
-  )
+      </Background>
+    )
+  } else {
+    return (
+      <Background>
+        <SafeAreaView>
+          <_Container>{children}</_Container>
+        </SafeAreaView>
+      </Background>
+    )
+  }
 }
 
 const Background = styled.View`

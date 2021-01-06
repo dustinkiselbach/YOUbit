@@ -36,8 +36,8 @@ const RadioFieldGroup: React.FC<RadioFieldGroupProps> = ({
             style={{ marginRight: idx % 2 === 1 ? 0 : 8 }}
           />
         ))}
-        {meta.error ? <Error>{meta.error}</Error> : null}
       </View>
+      {meta.error ? <Error>{meta.error}</Error> : null}
     </>
   )
 }

@@ -11,6 +11,7 @@ const currentWeek = getCurrentWeek()
 const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
   const [logout] = useLogout()
   const [day, setDay] = useState(new Date())
+
   const { data, error, loading } = useHabitIndexQuery({
     variables: {
       dayOfWeek: [daysOfWeek[day.getDay()]],

@@ -1,1 +1,1 @@
-This is the repo for YOUbit
+## YOUbit Habit Tracker

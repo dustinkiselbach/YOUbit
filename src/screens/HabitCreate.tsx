@@ -31,9 +31,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
   const [createHabit] = useCreateHabitMutation()
   const [logout] = useLogout()
 
-  data?.categoriesIndex.map((category, idx) =>
-    console.log(`index: ${idx}, name:${category.name} id:${category.id}`)
-  )
+  console.log(data)
 
   return (
     <Container>

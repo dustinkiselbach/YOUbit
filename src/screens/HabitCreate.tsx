@@ -31,7 +31,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
   const [createHabit] = useCreateHabitMutation()
   const [logout] = useLogout()
 
-  console.log(data)
+  console.log('categories query ' + data)
 
   return (
     <Container>
@@ -67,7 +67,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                   if (!data) {
                     throw new Error('habit has not been created')
                   }
-                  console.log(values.frequency)
+
                   for (const day of values.period === 'daily'
                     ? daysOfWeek
                     : values.frequency) {

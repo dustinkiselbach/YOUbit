@@ -10,7 +10,7 @@ import {
   useCreateHabitLogMutation,
   useDestroyHabitLogMutation
 } from '../generated/graphql'
-import { daysOfWeek } from '../utils'
+import { daysOfWeek, getCurrentWeek } from '../utils'
 import {
   CompositeNavigationProp,
   useNavigation
@@ -44,6 +44,8 @@ interface HabitCardProps extends TouchableOpacityProps {
   rest: HabitCardAdditionalProps
 }
 
+const currentWeek = getCurrentWeek()
+
 const HabitCard: React.FC<HabitCardProps> = ({
   name,
   habitType,
@@ -53,7 +55,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
   ...props
 }) => {
   const future = isFuture(day)
-  const dateString = day.toISOString().split('T')[0]
+  const dateString = currentWeek[day.getDay()].toISOString().split('T')[0]
   const dayOfWeek = [daysOfWeek[day.getDay()]]
 
   const [showMore, setShowMore] = useState(false)

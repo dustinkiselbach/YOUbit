@@ -1,13 +1,11 @@
+import { ApolloError } from '@apollo/client'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Platform } from 'react-native'
 import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
-import { useAuthDispatchContext } from '../context'
-import {
-  useCreateDeviceMutation,
-  UserCredentialsFragment
-} from '../generated/graphql'
+import { Platform } from 'react-native'
+import { useEffect } from 'react'
+import { useCreateDeviceMutation } from '../generated/graphql'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -16,52 +14,35 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false
   })
 })
+// @todo this may be unnecessary, the logic could likely be added to the useLogin,
 
-const useLogin = (): ((credentials: UserCredentialsFragment) => void)[] => {
-  const dispatch = useAuthDispatchContext()
+export default function useRegisterForPushNotifications (): void {
   const [createDevice] = useCreateDeviceMutation()
 
-  if (!dispatch) {
-    throw new Error('dispatch is not defined')
-  }
-  // @todo fix this
-  let platform = 'iOS'
-
-  if (Platform.OS === 'android') {
-    platform = 'Android'
-  }
-
-  const login = async ({
-    accessToken,
-    client,
-    uid,
-    expiry
-  }: UserCredentialsFragment): Promise<void> => {
-    // get token from storage if it exists
-    let token = await AsyncStorage.getItem('NOTIFICATION_TOKEN')
-    try {
-      await AsyncStorage.setItem('ACCESS_TOKEN', accessToken)
-      await AsyncStorage.setItem('CLIENT', client)
-      await AsyncStorage.setItem('UID', uid)
-      await AsyncStorage.setItem('EXPIRY', `${expiry}`)
-      dispatch({ type: 'SIGN_IN' })
-      //if it doesn't exist register for permissions
-      if (!token) {
-        console.log('new')
-        token = (await registerForPushNotificationsAsync()) || null
+  useEffect(() => {
+    ;(async () => {
+      if (!(await AsyncStorage.getItem('NOTIFICATION_TOKEN'))) {
+        const token = await registerForPushNotificationsAsync()
         if (token) {
           await AsyncStorage.setItem('NOTIFICATION_TOKEN', token)
+
+          try {
+            console.log('yes')
+            //@todo fix this for more cases
+            let platform = 'iOS'
+
+            if (Platform.OS === 'android') {
+              platform = 'Android'
+            }
+
+            await createDevice({ variables: { token, platform } })
+          } catch (err) {
+            console.log((err as ApolloError).graphQLErrors)
+          }
         }
       }
-
-      if (token) {
-        await createDevice({ variables: { token, platform } })
-      }
-    } catch (err) {
-      console.log((err as Error).message)
-    }
-  }
-  return [login]
+    })()
+  }, [createDevice])
 }
 
 async function registerForPushNotificationsAsync (): Promise<
@@ -97,5 +78,3 @@ async function registerForPushNotificationsAsync (): Promise<
 
   return token
 }
-
-export default useLogin

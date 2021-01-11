@@ -16,7 +16,7 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
     variables: {
       dayOfWeek: [daysOfWeek[day.getDay()]],
       active: true,
-      selectedDate: day.toISOString().split('T')[0]
+      selectedDate: currentWeek[day.getDay()].toISOString().split('T')[0]
     }
   })
 

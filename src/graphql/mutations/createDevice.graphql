@@ -1,0 +1,7 @@
+mutation createDevice($token: String!, $platform: String!) {
+  createDevice(token: $token, platform: $platform) {
+    device {
+      id
+    }
+  }
+}

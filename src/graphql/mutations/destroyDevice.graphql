@@ -1,0 +1,7 @@
+mutation destroyDevice($token: String!) {
+  destroyDevice(token: $token) {
+    device {
+      id
+    }
+  }
+}

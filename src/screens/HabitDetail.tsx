@@ -59,65 +59,74 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
             <Text variant='p'>{frequency.map(day => day + ' ')}</Text>
           </Spacer>
           <Spacer>
-            <HabitCompleted
-              isLogged={isLogged.logged}
-              future={future}
-              large
-              onPress={async () => {
-                if (future) {
-                  return
-                }
-                if (isLogged.logged) {
-                  try {
-                    await destroyHabitLog({
-                      variables: { habitLogId: isLogged.habitLog?.id || '' },
-                      refetchQueries: [
-                        {
-                          query: HabitIndexDocument,
-                          variables: {
-                            dayOfWeek,
-                            active: true,
-                            selectedDate: dateString
-                          }
-                        }
-                      ]
-                    })
-                  } catch (err) {
-                    console.log((err as Error).message)
+            <HabitCompletedContainer>
+              <HabitCompleted
+                isLogged={isLogged.logged}
+                future={future}
+                large
+                onPress={async () => {
+                  if (future) {
+                    return
                   }
-                } else {
-                  try {
-                    await createHabitLog({
-                      variables: {
-                        habitId: id,
-                        habitType,
-                        loggedDate: dateString
-                      },
-                      refetchQueries: [
-                        {
-                          query: HabitIndexDocument,
-                          variables: {
-                            dayOfWeek,
-                            active: true,
-                            selectedDate: dateString
+                  if (isLogged.logged) {
+                    try {
+                      await destroyHabitLog({
+                        variables: { habitLogId: isLogged.habitLog?.id || '' },
+                        refetchQueries: [
+                          {
+                            query: HabitIndexDocument,
+                            variables: {
+                              dayOfWeek,
+                              active: true,
+                              selectedDate: dateString
+                            }
                           }
-                        }
-                      ]
-                    })
-                  } catch (err) {
-                    console.log((err as Error).message)
+                        ]
+                      })
+                    } catch (err) {
+                      console.log((err as Error).message)
+                    }
+                  } else {
+                    try {
+                      await createHabitLog({
+                        variables: {
+                          habitId: id,
+                          habitType,
+                          loggedDate: dateString
+                        },
+                        refetchQueries: [
+                          {
+                            query: HabitIndexDocument,
+                            variables: {
+                              dayOfWeek,
+                              active: true,
+                              selectedDate: dateString
+                            }
+                          }
+                        ]
+                      })
+                    } catch (err) {
+                      console.log((err as Error).message)
+                    }
                   }
-                }
-              }}
-            >
+                }}
+              >
+                {isLogged.logged ? (
+                  <FontAwesome5
+                    name='check'
+                    size={28}
+                    color='rgba(255,255,255,0.9)'
+                  />
+                ) : null}
+              </HabitCompleted>
               {isLogged.logged ? (
-                <FontAwesome5
-                  name='check'
-                  size={28}
-                  color='rgba(255,255,255,0.9)'
-                />
+                <Text variant='h5'>
+                  {habitType === 'limit'
+                    ? "There's always tomorrow"
+                    : 'You are amazing!'}
+                </Text>
               ) : null}
-            </HabitCompleted>
+            </HabitCompletedContainer>
           </Spacer>
         </HabitDetailTop>
         <Spacer>
@@ -180,6 +189,11 @@ const StreakNumber = styled.Text`
   font-size: 35px;
   font-family: 'OpenSans-Bold';
   color: rgba(255, 255, 255, 0.9);
+`
+
+const HabitCompletedContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
 `
 
 export default HabitDetail

@@ -2,14 +2,20 @@ import React from 'react'
 import { Button, Container, SectionSpacer, Text } from '../components'
 import { MainTabNav } from '../types'
 import { useLogout } from '../utils'
-import { useUserLogoutMutation, useUserQuery } from '../generated/graphql'
+import {
+  useDestroyDeviceMutation,
+  useUserLogoutMutation,
+  useUserQuery
+} from '../generated/graphql'
 import styled from '../../styled-components'
 import { ActivityIndicator } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Settings: React.FC<MainTabNav<'Settings'>> = () => {
   const [logout] = useLogout()
   const { data, loading, error } = useUserQuery()
   const [userLogout] = useUserLogoutMutation()
+  const [destroyDevice] = useDestroyDeviceMutation()
 
   if (error) {
     logout()
@@ -32,6 +38,14 @@ const Settings: React.FC<MainTabNav<'Settings'>> = () => {
               title='Logout'
               onPress={async () => {
                 try {
+                  const deviceToken = await AsyncStorage.getItem(
+                    'NOTIFICATION_TOKEN'
+                  )
+                  if (deviceToken) {
+                    await destroyDevice({
+                      variables: { token: deviceToken }
+                    })
+                  }
                   await userLogout()
                   logout()
                 } catch (err) {

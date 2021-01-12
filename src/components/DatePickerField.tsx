@@ -9,9 +9,14 @@ import Label from './Label'
 interface DatePickerFieldProps {
   name: string
   label: string
+  mode: 'date' | 'time' | 'datetime'
 }
 
-const DatePickerField: React.FC<DatePickerFieldProps> = ({ name, label }) => {
+const DatePickerField: React.FC<DatePickerFieldProps> = ({
+  name,
+  label,
+  mode
+}) => {
   const [open, setOpen] = React.useState(false)
   const [field, meta, { setValue }] = useField({ name })
 
@@ -22,7 +27,9 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({ name, label }) => {
         <DateButton onPress={() => setOpen(true)}>
           <DateButtonText>
             {field.value
-              ? new Date(field.value).toLocaleDateString()
+              ? mode === 'date'
+                ? new Date(field.value).toLocaleDateString()
+                : new Date(field.value).toLocaleTimeString()
               : 'Select Date'}
           </DateButtonText>
         </DateButton>
@@ -32,7 +39,7 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({ name, label }) => {
       <DateTimePickerModal
         date={field.value}
         isVisible={open}
-        mode='date'
+        mode={mode}
         onConfirm={dt => {
           setOpen(false)
           setValue(dt)

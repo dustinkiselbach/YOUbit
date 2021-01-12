@@ -47,7 +47,7 @@ const useLogin = (): ((credentials: UserCredentialsFragment) => void)[] => {
       dispatch({ type: 'SIGN_IN' })
       //if it doesn't exist register for permissions
       if (!token) {
-        console.log('new')
+        console.log('asking for permissions async')
         token = (await registerForPushNotificationsAsync()) || null
         if (token) {
           await AsyncStorage.setItem('NOTIFICATION_TOKEN', token)

@@ -147,7 +147,11 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
                 </Spacer>
               ) : null}
               <Spacer>
-                <DatePickerField name='startDate' label='Start Date' />
+                <DatePickerField
+                  name='startDate'
+                  label='Start Date'
+                  mode='date'
+                />
               </Spacer>
               <Spacer>
                 <Button

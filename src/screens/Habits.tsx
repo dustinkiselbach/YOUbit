@@ -7,6 +7,7 @@ import { HabitStackNav } from '../types'
 import { daysOfWeek, getCurrentWeek, useLogout } from '../utils'
 
 const currentWeek = getCurrentWeek()
+// console.log(format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"))
 
 const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
   const [logout] = useLogout()

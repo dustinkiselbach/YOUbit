@@ -171,7 +171,11 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                 </Spacer>
               ) : null}
               <Spacer>
-                <DatePickerField name='startDate' label='Start Date' />
+                <DatePickerField
+                  name='startDate'
+                  label='Start Date'
+                  mode='date'
+                />
               </Spacer>
               <Spacer>
                 <Button

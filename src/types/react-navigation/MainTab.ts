@@ -3,6 +3,7 @@ import { RouteProp } from '@react-navigation/native'
 
 export type MainTabParamList = {
   Habits: undefined
+  HabitReminders: undefined
   HabitCreate: undefined
   Settings: undefined
   HabitArchive: undefined

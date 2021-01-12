@@ -1,13 +1,13 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { HabitArchive, HabitCreate, Settings } from '../screens'
+import { HabitArchive, HabitCreate, HabitReminders, Settings } from '../screens'
 import HabitStack from './HabitStack'
 import { MainTabParamList } from '../types'
 import { Feather } from '@expo/vector-icons'
 
 function getIcon (
   route: keyof MainTabParamList
-): 'list' | 'plus-circle' | 'settings' | 'alert-triangle' | 'archive' {
+): 'list' | 'plus-circle' | 'settings' | 'alert-triangle' | 'archive' | 'bell' {
   switch (route) {
     case 'Habits':
       return 'list'
@@ -17,6 +17,8 @@ function getIcon (
       return 'settings'
     case 'HabitArchive':
       return 'archive'
+    case 'HabitReminders':
+      return 'bell'
     default:
       return 'alert-triangle'
   }
@@ -43,6 +45,11 @@ const MainTab: React.FC = () => {
       }}
     >
       <Tab.Screen name='Habits' component={HabitStack} />
+      <Tab.Screen
+        name='HabitReminders'
+        component={HabitReminders}
+        options={{ title: 'Reminders' }}
+      />
       <Tab.Screen
         name='HabitCreate'
         component={HabitCreate}

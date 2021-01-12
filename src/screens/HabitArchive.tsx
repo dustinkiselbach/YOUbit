@@ -32,8 +32,8 @@ const HabitArchive: React.FC = () => {
         Archive
       </Text>
       {!data?.habitIndex.length && !loading ? (
-        <Text variant='h3' style={{ marginTop: 16 }}>
-          Nothing currently archived!
+        <Text variant='h4' style={{ marginTop: 16 }}>
+          Nothing currently archived
         </Text>
       ) : loading ? (
         <ActivityIndicator size='large' color='#00C2CB' />

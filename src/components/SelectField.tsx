@@ -4,14 +4,13 @@ import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 import styled from '../../styled-components'
 import Label from './Label'
 import { Feather } from '@expo/vector-icons'
-
-import { fluidRange } from 'polished'
+import { ArchivedHabitsQuery } from '../generated/graphql'
 
 interface SelectFieldProps {
   name: string
   label: string
   defaultValue: string
-  options: { name: string; time: Date }[]
+  options?: ArchivedHabitsQuery
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -37,10 +36,17 @@ const SelectField: React.FC<SelectFieldProps> = ({
       {showOptions ? (
         <SelectListOptions>
           <FlatList
-            data={options}
+            data={options?.habitIndex}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => setValue(item.name)}>
-                <SelectButtonText style={{ fontFamily: 'OpenSans-Regular' }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setValue(item.name)
+                  setShowOptions(false)
+                }}
+              >
+                <SelectButtonText
+                  style={{ fontFamily: 'OpenSans-Regular', color: 'white' }}
+                >
                   {item.name}
                 </SelectButtonText>
               </TouchableOpacity>
@@ -74,13 +80,14 @@ const SelectChevron = styled.TouchableOpacity`
 `
 
 const SelectListOptions = styled.View`
-  max-height: 120px;
+  margin-top: 2px;
+  max-height: 80px;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   border-radius: 2px;
   padding: 10px 12px;
-  background-color: ${({ theme }) => theme.colors.colorLightGrey};
+  background-color: rgba(0, 0, 0, 0.566);
 `
 
 export default SelectField

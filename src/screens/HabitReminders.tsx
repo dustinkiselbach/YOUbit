@@ -14,8 +14,10 @@ import {
 import { Feather } from '@expo/vector-icons'
 import { Formik } from 'formik'
 import * as Localization from 'expo-localization'
+import { useArchivedHabitsQuery } from '../generated/graphql'
+import { daysOfWeek } from '../utils'
 
-const data = [
+const fakeData = [
   { name: 'fart', time: new Date() },
   { name: 'number 22', time: new Date() }
 ]
@@ -24,9 +26,16 @@ const HabitReminders: React.FC = () => {
   console.log(Localization.timezone)
   const [showReminderModal, setShowReminderModal] = useState(false)
   const [updating, setUpdating] = useState(false)
-  const [itemToUpdate, setItemToUpdate] = useState<null | typeof data[number]>(
-    null
-  )
+  const [itemToUpdate, setItemToUpdate] = useState<
+    null | typeof fakeData[number]
+  >(null)
+
+  const { data } = useArchivedHabitsQuery({
+    variables: {
+      active: true,
+      dayOfWeek: (daysOfWeek as unknown) as string[]
+    }
+  })
 
   const onUpdate = (name: string, time: Date): void => {
     setItemToUpdate({ name, time })
@@ -42,7 +51,7 @@ const HabitReminders: React.FC = () => {
         </ReminderIcon>
       </Top>
       <FlatList
-        data={data}
+        data={fakeData}
         renderItem={({ item }) => (
           <ReminderCard
             {...{ updating, onUpdate }}

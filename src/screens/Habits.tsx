@@ -25,6 +25,8 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
     logout()
   }
 
+  const none = !data?.habitIndex.length
+
   const completedActivities = data?.habitIndex.filter(
     ({ isLogged: { logged } }) => logged
   )
@@ -59,15 +61,21 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
   return (
     <Container>
       <Dates dates={currentWeek} selected={day} changeSelected={setDay} />
-      <ScrollView>
-        <SectionSpacer>
-          {loading ? (
-            <ActivityIndicator size='large' color='#00C2CB' />
-          ) : (
-            allActivities
-          )}
-        </SectionSpacer>
-      </ScrollView>
+      {none && !loading ? (
+        <Text variant='h4' style={{ marginTop: 16 }}>
+          No habits for this day
+        </Text>
+      ) : (
+        <ScrollView>
+          <SectionSpacer>
+            {loading ? (
+              <ActivityIndicator size='large' color='#00C2CB' />
+            ) : (
+              allActivities
+            )}
+          </SectionSpacer>
+        </ScrollView>
+      )}
     </Container>
   )
 }

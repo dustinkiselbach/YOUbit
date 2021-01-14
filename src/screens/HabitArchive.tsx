@@ -4,6 +4,7 @@ import styled from '../../styled-components'
 import { Container, Text } from '../components'
 import {
   ArchivedHabitsDocument,
+  RemindersIndexDocument,
   useArchivedHabitsQuery,
   useArchiveOrActivateHabitMutation,
   useDestroyHabitMutation
@@ -96,6 +97,9 @@ const HabitArchive: React.FC = () => {
                                   active: false,
                                   dayOfWeek: (daysOfWeek as unknown) as string[]
                                 }
+                              },
+                              {
+                                query: RemindersIndexDocument
                               }
                             ]
                           })

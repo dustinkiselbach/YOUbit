@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Alert, FlatList, Modal } from 'react-native'
+import { ActivityIndicator, Alert, FlatList, Modal } from 'react-native'
 import styled from '../../styled-components'
 
 import {
@@ -14,21 +14,28 @@ import {
 import { Feather } from '@expo/vector-icons'
 import { Formik } from 'formik'
 import * as Localization from 'expo-localization'
-import { useArchivedHabitsQuery } from '../generated/graphql'
+import {
+  RemindersIndexDocument,
+  useArchivedHabitsQuery,
+  useCreateReminderMutation,
+  useRemindersIndexQuery
+} from '../generated/graphql'
 import { daysOfWeek } from '../utils'
 
-const fakeData = [
-  { name: 'fart', time: new Date() },
-  { name: 'number 22', time: new Date() }
-]
+const fakeData = [{ id: '12', time: new Date() }]
 
 const HabitReminders: React.FC = () => {
-  console.log(Localization.timezone)
   const [showReminderModal, setShowReminderModal] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [itemToUpdate, setItemToUpdate] = useState<
     null | typeof fakeData[number]
   >(null)
+
+  const [createReminder] = useCreateReminderMutation()
+  // @todo get cache working with reminders
+  const { data: remindersData, loading } = useRemindersIndexQuery({
+    nextFetchPolicy: 'network-only'
+  })
 
   const { data } = useArchivedHabitsQuery({
     variables: {
@@ -37,41 +44,75 @@ const HabitReminders: React.FC = () => {
     }
   })
 
-  const onUpdate = (name: string, time: Date): void => {
-    setItemToUpdate({ name, time })
+  const onUpdate = (id: string, time: Date): void => {
+    setItemToUpdate({ id, time })
     setShowReminderModal(true)
   }
+  const none = !remindersData?.remindersIndex.length
+  const noneHabits = !data?.habitIndex.length
 
   return (
     <Container>
       <Top>
         <Text variant='h1'>Reminders</Text>
-        <ReminderIcon onPress={() => setUpdating(isUpdating => !isUpdating)}>
-          <Feather name='edit' size={24} color='#535353' />
-        </ReminderIcon>
-      </Top>
-      <FlatList
-        data={fakeData}
-        renderItem={({ item }) => (
-          <ReminderCard
-            {...{ updating, onUpdate }}
-            name={item.name}
-            time={item.time}
-          />
-        )}
-        keyExtractor={(_, index) => `${index}`}
-        contentContainerStyle={{ paddingHorizontal: updating ? 16 : 0 }}
-        ListFooterComponent={() => (
+        {none && !loading ? (
           <ReminderIcon
             onPress={() => {
-              setShowReminderModal(true)
-              setUpdating(false)
+              if (noneHabits) {
+                Alert.alert(
+                  'No Habits',
+                  'You have no habits to add a reminder for'
+                )
+              } else {
+                setShowReminderModal(true)
+                setUpdating(false)
+              }
             }}
           >
             <Feather name='plus' size={24} color='#535353' />
           </ReminderIcon>
+        ) : (
+          <ReminderIcon onPress={() => setUpdating(isUpdating => !isUpdating)}>
+            <Feather name='edit' size={24} color='#535353' />
+          </ReminderIcon>
         )}
-      />
+      </Top>
+      {loading ? (
+        <ActivityIndicator size='large' color='#00C2CB' />
+      ) : (
+        <FlatList
+          data={remindersData?.remindersIndex}
+          renderItem={({ item }) => (
+            <ReminderCard
+              {...{ updating, onUpdate }}
+              name={item.habit.name}
+              time={item.remindAt}
+              id={item.id}
+            />
+          )}
+          keyExtractor={(_, index) => `${index}`}
+          contentContainerStyle={{ paddingHorizontal: updating ? 16 : 0 }}
+          ListFooterComponent={() =>
+            none ? null : (
+              <ReminderIcon
+                onPress={() => {
+                  if (noneHabits) {
+                    Alert.alert(
+                      'No Habits',
+                      'You have no habits to add a reminder for'
+                    )
+                  } else {
+                    setShowReminderModal(true)
+                    setUpdating(false)
+                  }
+                }}
+              >
+                <Feather name='plus' size={24} color='#535353' />
+              </ReminderIcon>
+            )
+          }
+        />
+      )}
 
       <Modal
         animationType='slide'
@@ -109,26 +150,40 @@ const HabitReminders: React.FC = () => {
               validateOnBlur={false}
               validateOnChange={false}
               initialValues={{
-                habitName: itemToUpdate ? itemToUpdate.name : '',
-                time: itemToUpdate ? itemToUpdate.time : new Date()
+                time: itemToUpdate ? itemToUpdate.time : new Date(),
+                id: itemToUpdate ? itemToUpdate.id : ''
               }}
-              onSubmit={values => {
+              onSubmit={async values => {
                 if (itemToUpdate) {
                   console.log('updating...')
                   console.log(values)
                   // update
                 } else {
-                  console.log('saving...')
-                  console.log(values)
+                  try {
+                    await createReminder({
+                      variables: {
+                        timeZone: Localization.timezone,
+                        remindAt: values.time,
+                        habitId: values.id
+                      },
+                      refetchQueries: [
+                        {
+                          query: RemindersIndexDocument
+                        }
+                      ]
+                    })
+                  } catch (err) {
+                    console.log(err)
+                  }
                 }
               }}
             >
-              {({ handleSubmit, isSubmitting, values }) => (
+              {({ handleSubmit, isSubmitting }) => (
                 <>
                   {!itemToUpdate ? (
                     <Spacer>
                       <SelectField
-                        name='habitName'
+                        name='id'
                         label='Name'
                         defaultValue='Select Habit'
                         options={data}

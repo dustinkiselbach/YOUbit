@@ -16,7 +16,9 @@ import {
   useCreateHabitMutation,
   HabitIndexDocument,
   HabitIndexQuery,
-  useCategoriesIndexQuery
+  useCategoriesIndexQuery,
+  ArchivedHabitsQuery,
+  ArchivedHabitsDocument
 } from '../generated/graphql'
 import { ApolloError } from '@apollo/client'
 import { daysOfWeek, getCurrentWeek, useLogout } from '../utils'
@@ -61,11 +63,33 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                   // @todo allow categories
                   categoryName: 'fart'
                 },
+
                 // always dependant on variables
                 // going to loop through and revalidate based on days in frequency array
                 update: (store, { data }) => {
                   if (!data) {
                     throw new Error('habit has not been created')
+                  }
+                  // updating for reminders
+                  const habitData = store.readQuery<ArchivedHabitsQuery>({
+                    query: ArchivedHabitsDocument,
+                    variables: {
+                      active: true,
+                      dayOfWeek: (daysOfWeek as unknown) as string[]
+                    }
+                  })
+                  if (habitData) {
+                    store.writeQuery({
+                      query: ArchivedHabitsDocument,
+                      variables: {
+                        active: true,
+                        dayOfWeek: (daysOfWeek as unknown) as string[]
+                      },
+                      data: {
+                        ...habitData,
+                        habitIndex: [...habitData?.habitIndex, data.createHabit]
+                      }
+                    })
                   }
 
                   for (const day of values.period === 'daily'
@@ -113,7 +137,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                 navigation.navigate('Habits')
               }
             } catch (err) {
-              console.log((err as ApolloError).graphQLErrors)
+              console.log(err as ApolloError)
               if (
                 (err as ApolloError).graphQLErrors[0].extensions?.code ===
                 'AUTHENTICATION ERROR'

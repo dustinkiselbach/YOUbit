@@ -1,6 +1,6 @@
 import { useField } from 'formik'
 import React, { useState } from 'react'
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { FlatList, Modal, TouchableOpacity } from 'react-native'
 import styled from '../../styled-components'
 import Label from './Label'
 import { Feather } from '@expo/vector-icons'
@@ -21,39 +21,49 @@ const SelectField: React.FC<SelectFieldProps> = ({
 }) => {
   const [showOptions, setShowOptions] = useState(false)
   const [field, meta, { setValue }] = useField({ name })
+  const selected = options?.habitIndex.filter(
+    habit => habit.id == field.value
+  )[0]
 
   return (
     <>
       <Label>{label}</Label>
       <SelectButton>
         <SelectButtonText>
-          {field.value ? field.value : defaultValue}
+          {field.value ? selected?.name : defaultValue}
         </SelectButtonText>
         <SelectChevron onPress={() => setShowOptions(true)}>
           <Feather name='chevron-down' size={24} color='#535353' />
         </SelectChevron>
       </SelectButton>
-      {showOptions ? (
-        <SelectListOptions>
-          <FlatList
-            data={options?.habitIndex}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  setValue(item.name)
-                  setShowOptions(false)
-                }}
-              >
-                <SelectButtonText
-                  style={{ fontFamily: 'OpenSans-Regular', color: 'white' }}
-                >
-                  {item.name}
-                </SelectButtonText>
-              </TouchableOpacity>
-            )}
-          />
-        </SelectListOptions>
-      ) : null}
+      <Modal animationType='fade' transparent={true} visible={showOptions}>
+        <CenteredView>
+          <ModalContainer>
+            <SelectListOptions>
+              <FlatList
+                data={options?.habitIndex}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setValue(item.id)
+                      setShowOptions(false)
+                    }}
+                  >
+                    <SelectButtonText
+                      style={{ fontFamily: 'OpenSans-Regular', color: 'white' }}
+                    >
+                      {selected?.name === item.name ? (
+                        <Feather name='check' size={18} color='white' />
+                      ) : null}
+                      {item.name}
+                    </SelectButtonText>
+                  </TouchableOpacity>
+                )}
+              />
+            </SelectListOptions>
+          </ModalContainer>
+        </CenteredView>
+      </Modal>
     </>
   )
 }
@@ -81,13 +91,25 @@ const SelectChevron = styled.TouchableOpacity`
 
 const SelectListOptions = styled.View`
   margin-top: 2px;
-  max-height: 80px;
+  max-height: 200px;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  border-radius: 2px;
+  border-radius: 10px;
   padding: 10px 12px;
-  background-color: rgba(0, 0, 0, 0.566);
+  background-color: rgba(0, 0, 0, 0.8);
+  margin-bottom: 120px;
+`
+
+const CenteredView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`
+
+const ModalContainer = styled.View`
+  padding: 20px;
+  width: 75%;
 `
 
 export default SelectField

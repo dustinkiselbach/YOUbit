@@ -1,0 +1,9 @@
+query remindersIndex {
+  remindersIndex {
+    habit {
+      name
+    }
+    id
+    remindAt
+  }
+}

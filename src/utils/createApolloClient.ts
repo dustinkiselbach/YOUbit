@@ -12,6 +12,11 @@ const cache = new InMemoryCache({
           merge (_, incoming) {
             return incoming
           }
+        },
+        remindersIndex: {
+          merge (_, incoming) {
+            return incoming
+          }
         }
       }
     }

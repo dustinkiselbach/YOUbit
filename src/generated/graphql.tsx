@@ -232,6 +232,7 @@ export type MutationCreateHabitLogArgs = {
 
 export type MutationCreateReminderArgs = {
   remindAt: Scalars['ISO8601DateTime'];
+  timeZone: Scalars['String'];
   habitId: Scalars['ID'];
 };
 
@@ -301,6 +302,8 @@ export type Query = {
   habit: Habit;
   /** Returns the Habits of the signed in User. */
   habitIndex: Array<Habit>;
+  /** Returns the Reminders of the signed in User. */
+  remindersIndex: Array<Reminder>;
   /** Returns the currently signed in user. */
   user: User;
   /**
@@ -511,6 +514,24 @@ export type CreateHabitLogMutation = (
   )> }
 );
 
+export type CreateReminderMutationVariables = Exact<{
+  remindAt: Scalars['ISO8601DateTime'];
+  timeZone: Scalars['String'];
+  habitId: Scalars['ID'];
+}>;
+
+
+export type CreateReminderMutation = (
+  { __typename?: 'Mutation' }
+  & { createReminder?: Maybe<(
+    { __typename?: 'CreateReminderPayload' }
+    & { reminder: (
+      { __typename?: 'Reminder' }
+      & Pick<Reminder, 'id'>
+    ) }
+  )> }
+);
+
 export type DestroyDeviceMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -555,6 +576,22 @@ export type DestroyHabitLogMutation = (
     & { habitLog: (
       { __typename?: 'HabitLog' }
       & Pick<HabitLog, 'id'>
+    ) }
+  )> }
+);
+
+export type DestroyReminderMutationVariables = Exact<{
+  reminderId: Scalars['ID'];
+}>;
+
+
+export type DestroyReminderMutation = (
+  { __typename?: 'Mutation' }
+  & { destroyReminder?: Maybe<(
+    { __typename?: 'DestroyReminderPayload' }
+    & { reminder: (
+      { __typename?: 'Reminder' }
+      & Pick<Reminder, 'id'>
     ) }
   )> }
 );
@@ -745,6 +782,21 @@ export type UserQuery = (
   ) }
 );
 
+export type RemindersIndexQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemindersIndexQuery = (
+  { __typename?: 'Query' }
+  & { remindersIndex: Array<(
+    { __typename?: 'Reminder' }
+    & Pick<Reminder, 'id' | 'remindAt'>
+    & { habit: (
+      { __typename?: 'Habit' }
+      & Pick<Habit, 'name'>
+    ) }
+  )> }
+);
+
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -917,6 +969,42 @@ export function useCreateHabitLogMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateHabitLogMutationHookResult = ReturnType<typeof useCreateHabitLogMutation>;
 export type CreateHabitLogMutationResult = Apollo.MutationResult<CreateHabitLogMutation>;
 export type CreateHabitLogMutationOptions = Apollo.BaseMutationOptions<CreateHabitLogMutation, CreateHabitLogMutationVariables>;
+export const CreateReminderDocument = gql`
+    mutation createReminder($remindAt: ISO8601DateTime!, $timeZone: String!, $habitId: ID!) {
+  createReminder(remindAt: $remindAt, timeZone: $timeZone, habitId: $habitId) {
+    reminder {
+      id
+    }
+  }
+}
+    `;
+export type CreateReminderMutationFn = Apollo.MutationFunction<CreateReminderMutation, CreateReminderMutationVariables>;
+
+/**
+ * __useCreateReminderMutation__
+ *
+ * To run a mutation, you first call `useCreateReminderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateReminderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createReminderMutation, { data, loading, error }] = useCreateReminderMutation({
+ *   variables: {
+ *      remindAt: // value for 'remindAt'
+ *      timeZone: // value for 'timeZone'
+ *      habitId: // value for 'habitId'
+ *   },
+ * });
+ */
+export function useCreateReminderMutation(baseOptions?: Apollo.MutationHookOptions<CreateReminderMutation, CreateReminderMutationVariables>) {
+        return Apollo.useMutation<CreateReminderMutation, CreateReminderMutationVariables>(CreateReminderDocument, baseOptions);
+      }
+export type CreateReminderMutationHookResult = ReturnType<typeof useCreateReminderMutation>;
+export type CreateReminderMutationResult = Apollo.MutationResult<CreateReminderMutation>;
+export type CreateReminderMutationOptions = Apollo.BaseMutationOptions<CreateReminderMutation, CreateReminderMutationVariables>;
 export const DestroyDeviceDocument = gql`
     mutation destroyDevice($token: String!) {
   destroyDevice(token: $token) {
@@ -1019,6 +1107,40 @@ export function useDestroyHabitLogMutation(baseOptions?: Apollo.MutationHookOpti
 export type DestroyHabitLogMutationHookResult = ReturnType<typeof useDestroyHabitLogMutation>;
 export type DestroyHabitLogMutationResult = Apollo.MutationResult<DestroyHabitLogMutation>;
 export type DestroyHabitLogMutationOptions = Apollo.BaseMutationOptions<DestroyHabitLogMutation, DestroyHabitLogMutationVariables>;
+export const DestroyReminderDocument = gql`
+    mutation destroyReminder($reminderId: ID!) {
+  destroyReminder(reminderId: $reminderId) {
+    reminder {
+      id
+    }
+  }
+}
+    `;
+export type DestroyReminderMutationFn = Apollo.MutationFunction<DestroyReminderMutation, DestroyReminderMutationVariables>;
+
+/**
+ * __useDestroyReminderMutation__
+ *
+ * To run a mutation, you first call `useDestroyReminderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDestroyReminderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [destroyReminderMutation, { data, loading, error }] = useDestroyReminderMutation({
+ *   variables: {
+ *      reminderId: // value for 'reminderId'
+ *   },
+ * });
+ */
+export function useDestroyReminderMutation(baseOptions?: Apollo.MutationHookOptions<DestroyReminderMutation, DestroyReminderMutationVariables>) {
+        return Apollo.useMutation<DestroyReminderMutation, DestroyReminderMutationVariables>(DestroyReminderDocument, baseOptions);
+      }
+export type DestroyReminderMutationHookResult = ReturnType<typeof useDestroyReminderMutation>;
+export type DestroyReminderMutationResult = Apollo.MutationResult<DestroyReminderMutation>;
+export type DestroyReminderMutationOptions = Apollo.BaseMutationOptions<DestroyReminderMutation, DestroyReminderMutationVariables>;
 export const UserLogoutDocument = gql`
     mutation userLogout {
   userLogout {
@@ -1441,3 +1563,39 @@ export function useUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserQ
 export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
+export const RemindersIndexDocument = gql`
+    query remindersIndex {
+  remindersIndex {
+    habit {
+      name
+    }
+    id
+    remindAt
+  }
+}
+    `;
+
+/**
+ * __useRemindersIndexQuery__
+ *
+ * To run a query within a React component, call `useRemindersIndexQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRemindersIndexQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRemindersIndexQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRemindersIndexQuery(baseOptions?: Apollo.QueryHookOptions<RemindersIndexQuery, RemindersIndexQueryVariables>) {
+        return Apollo.useQuery<RemindersIndexQuery, RemindersIndexQueryVariables>(RemindersIndexDocument, baseOptions);
+      }
+export function useRemindersIndexLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RemindersIndexQuery, RemindersIndexQueryVariables>) {
+          return Apollo.useLazyQuery<RemindersIndexQuery, RemindersIndexQueryVariables>(RemindersIndexDocument, baseOptions);
+        }
+export type RemindersIndexQueryHookResult = ReturnType<typeof useRemindersIndexQuery>;
+export type RemindersIndexLazyQueryHookResult = ReturnType<typeof useRemindersIndexLazyQuery>;
+export type RemindersIndexQueryResult = Apollo.QueryResult<RemindersIndexQuery, RemindersIndexQueryVariables>;

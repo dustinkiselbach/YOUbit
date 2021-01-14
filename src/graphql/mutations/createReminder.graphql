@@ -1,0 +1,11 @@
+mutation createReminder(
+  $remindAt: ISO8601DateTime!
+  $timeZone: String!
+  $habitId: ID!
+) {
+  createReminder(remindAt: $remindAt, timeZone: $timeZone, habitId: $habitId) {
+    reminder {
+      id
+    }
+  }
+}

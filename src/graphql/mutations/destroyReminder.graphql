@@ -1,0 +1,7 @@
+mutation destroyReminder($reminderId: ID!) {
+  destroyReminder(reminderId: $reminderId) {
+    reminder {
+      id
+    }
+  }
+}

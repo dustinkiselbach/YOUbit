@@ -2,8 +2,9 @@ import React from 'react'
 import styled from '../../styled-components'
 import { Container, Text, HabitCompleted, Spacer } from '../components'
 import { FontAwesome5 } from '@expo/vector-icons'
+import { Feather } from '@expo/vector-icons'
 
-import { HabitStackNav } from '../types'
+import { HabitStackNav, HabitStackParamList, MainTabParamList } from '../types'
 import {
   HabitIndexDocument,
   useCreateHabitLogMutation,
@@ -12,11 +13,20 @@ import {
 } from '../generated/graphql'
 
 import { isFuture } from 'date-fns'
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'
+import { CompositeNavigationProp } from '@react-navigation/native'
+import { StackNavigationProp } from '@react-navigation/stack'
+
+type HabitDetailNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList, 'Habits'>,
+  StackNavigationProp<HabitStackParamList>
+>
 
 const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
   route: {
     params: { id, dateString, dayOfWeek }
-  }
+  },
+  navigation
 }) => {
   const future = isFuture(new Date(dateString))
 
@@ -44,7 +54,8 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
     habitType,
     isLogged,
     longestStreak,
-    currentStreak
+    currentStreak,
+    reminders
   } = habit[0]
 
   return (
@@ -154,6 +165,38 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
             </Spacer>
           </HabitDetailStreaks>
         </Spacer>
+        <Spacer>
+          <HabitDetailReminders>
+            <Text variant='h2'>Reminders</Text>
+            {reminders?.length ? (
+              reminders?.map(({ id, remindAt }) => (
+                <ReminderItem key={id}>
+                  <Text variant='p'>
+                    {new Date(remindAt).toLocaleTimeString()}
+                  </Text>
+                </ReminderItem>
+              ))
+            ) : (
+              <ReminderItem>
+                <Text variant='p'>No reminders for this habit</Text>
+              </ReminderItem>
+            )}
+            <DetailIcon
+              onPress={() =>
+                (navigation as HabitDetailNavigationProp).navigate(
+                  'HabitReminders',
+                  {
+                    habitParamId: id,
+                    dateString,
+                    dayOfWeek
+                  }
+                )
+              }
+            >
+              <Feather name='plus' size={24} color='#535353' />
+            </DetailIcon>
+          </HabitDetailReminders>
+        </Spacer>
       </_HabitDetail>
     </Container>
   )
@@ -194,6 +237,17 @@ const StreakNumber = styled.Text`
 const HabitCompletedContainer = styled.View`
   flex-direction: row;
   align-items: center;
+`
+
+const HabitDetailReminders = styled.View``
+
+const ReminderItem = styled.View`
+  margin-top: 4px;
+`
+
+const DetailIcon = styled.TouchableOpacity`
+  padding: 4px;
+  width: 32px;
 `
 
 export default HabitDetail

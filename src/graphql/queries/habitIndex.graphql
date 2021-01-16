@@ -21,6 +21,10 @@ query habitIndex(
     currentStreak(selectedDate: $selectedDate) {
       habitStreak
     }
+    reminders {
+      id
+      remindAt
+    }
   }
 }
 # add category!

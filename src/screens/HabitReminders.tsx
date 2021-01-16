@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, FlatList, Modal } from 'react-native'
 import styled from '../../styled-components'
 
@@ -15,16 +15,21 @@ import { Feather } from '@expo/vector-icons'
 import { Formik } from 'formik'
 import * as Localization from 'expo-localization'
 import {
+  HabitIndexDocument,
   RemindersIndexDocument,
   useArchivedHabitsQuery,
   useCreateReminderMutation,
   useRemindersIndexQuery
 } from '../generated/graphql'
 import { daysOfWeek } from '../utils'
+import { MainTabNav } from '../types'
 
 const fakeData = [{ id: '12', time: new Date() }]
 
-const HabitReminders: React.FC = () => {
+const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
+  navigation,
+  route: { params }
+}) => {
   const [showReminderModal, setShowReminderModal] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [itemToUpdate, setItemToUpdate] = useState<
@@ -33,16 +38,27 @@ const HabitReminders: React.FC = () => {
 
   const [createReminder] = useCreateReminderMutation()
   // @todo get cache working with reminders
-  const { data: remindersData, loading } = useRemindersIndexQuery({
-    nextFetchPolicy: 'network-only'
-  })
+  const { data: remindersData, loading } = useRemindersIndexQuery()
 
   const { data } = useArchivedHabitsQuery({
     variables: {
       active: true,
       dayOfWeek: (daysOfWeek as unknown) as string[]
-    }
+    },
+    fetchPolicy: 'cache-and-network'
   })
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      setUpdating(false)
+    })
+
+    if (params?.habitParamId) {
+      setShowReminderModal(true)
+    }
+
+    return unsubscribe
+  }, [navigation, params])
 
   const onUpdate = (id: string, time: Date): void => {
     setItemToUpdate({ id, time })
@@ -118,9 +134,6 @@ const HabitReminders: React.FC = () => {
         animationType='slide'
         transparent={true}
         visible={showReminderModal}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.')
-        }}
       >
         <CenteredView>
           <ModalContainer
@@ -151,7 +164,7 @@ const HabitReminders: React.FC = () => {
               validateOnChange={false}
               initialValues={{
                 time: itemToUpdate ? itemToUpdate.time : new Date(),
-                id: itemToUpdate ? itemToUpdate.id : ''
+                id: itemToUpdate ? itemToUpdate.id : params?.habitParamId || ''
               }}
               onSubmit={async values => {
                 if (itemToUpdate) {
@@ -167,9 +180,25 @@ const HabitReminders: React.FC = () => {
                         habitId: values.id
                       },
                       refetchQueries: [
-                        {
-                          query: RemindersIndexDocument
-                        }
+                        ...(params
+                          ? [
+                              {
+                                query: RemindersIndexDocument
+                              },
+                              {
+                                query: HabitIndexDocument,
+                                variables: {
+                                  dayOfWeek: params.dayOfWeek,
+                                  active: true,
+                                  selectedDate: params.dateString
+                                }
+                              }
+                            ]
+                          : [
+                              {
+                                query: RemindersIndexDocument
+                              }
+                            ])
                       ]
                     })
                   } catch (err) {

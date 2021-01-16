@@ -39,6 +39,7 @@ const useLogin = (): ((credentials: UserCredentialsFragment) => void)[] => {
   }: UserCredentialsFragment): Promise<void> => {
     // get token from storage if it exists
     let token = await AsyncStorage.getItem('NOTIFICATION_TOKEN')
+
     try {
       await AsyncStorage.setItem('ACCESS_TOKEN', accessToken)
       await AsyncStorage.setItem('CLIENT', client)

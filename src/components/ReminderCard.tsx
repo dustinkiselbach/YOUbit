@@ -4,9 +4,12 @@ import styled from '../../styled-components'
 import { Feather } from '@expo/vector-icons'
 import { Alert, Animated } from 'react-native'
 import {
+  HabitIndexDocument,
   RemindersIndexDocument,
   useDestroyReminderMutation
 } from '../generated/graphql'
+import { useRoute } from '@react-navigation/native'
+import { MainTabNav } from '../types'
 
 interface ReminderCardProps {
   updating: boolean
@@ -23,10 +26,13 @@ const ReminderCard: React.FC<ReminderCardProps> = ({
   updating,
   onUpdate
 }) => {
+  const { params } = useRoute<MainTabNav<'HabitReminders'>['route']>()
+
   const [destroyReminder] = useDestroyReminderMutation()
   // Wiggle Animation
   const timeAsDate = new Date(time)
   const wiggleAnim = useRef(new Animated.Value(0)).current
+
   useEffect(() => {
     const wiggle = (): void => {
       Animated.sequence([
@@ -85,9 +91,25 @@ const ReminderCard: React.FC<ReminderCardProps> = ({
                       await destroyReminder({
                         variables: { reminderId: id },
                         refetchQueries: [
-                          {
-                            query: RemindersIndexDocument
-                          }
+                          ...(params
+                            ? [
+                                {
+                                  query: RemindersIndexDocument
+                                },
+                                {
+                                  query: HabitIndexDocument,
+                                  variables: {
+                                    dayOfWeek: params.dayOfWeek,
+                                    active: true,
+                                    selectedDate: params.dateString
+                                  }
+                                }
+                              ]
+                            : [
+                                {
+                                  query: RemindersIndexDocument
+                                }
+                              ])
                         ]
                       })
                     } catch (err) {

@@ -767,7 +767,10 @@ export type HabitIndexQuery = (
     )>, currentStreak?: Maybe<(
       { __typename?: 'Streak' }
       & Pick<Streak, 'habitStreak'>
-    )> }
+    )>, reminders?: Maybe<Array<(
+      { __typename?: 'Reminder' }
+      & Pick<Reminder, 'id' | 'remindAt'>
+    )>> }
   )> }
 );
 
@@ -1499,6 +1502,10 @@ export const HabitIndexDocument = gql`
     }
     currentStreak(selectedDate: $selectedDate) {
       habitStreak
+    }
+    reminders {
+      id
+      remindAt
     }
   }
 }

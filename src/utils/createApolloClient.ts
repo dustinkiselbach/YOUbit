@@ -19,6 +19,15 @@ const cache = new InMemoryCache({
           }
         }
       }
+    },
+    Habit: {
+      fields: {
+        reminders: {
+          merge (_, incoming) {
+            return incoming
+          }
+        }
+      }
     }
   }
 })

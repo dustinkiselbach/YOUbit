@@ -1,7 +1,7 @@
 import { useField } from 'formik'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { FlatList, Modal, TouchableOpacity } from 'react-native'
-import styled from '../../styled-components'
+import styled, { ThemeContext } from '../../styled-components'
 import Label from './Label'
 import { Feather } from '@expo/vector-icons'
 import { ArchivedHabitsQuery } from '../generated/graphql'
@@ -21,6 +21,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
 }) => {
   const [showOptions, setShowOptions] = useState(false)
   const [field, meta, { setValue }] = useField({ name })
+  const themeContext = useContext(ThemeContext)
   const selected = options?.habitIndex.filter(
     habit => habit.id == field.value
   )[0]
@@ -33,7 +34,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
           {field.value ? selected?.name : defaultValue}
         </SelectButtonText>
         <SelectChevron onPress={() => setShowOptions(true)}>
-          <Feather name='chevron-down' size={24} color='#535353' />
+          <Feather
+            name='chevron-down'
+            size={24}
+            color={themeContext.colors.colorText}
+          />
         </SelectChevron>
       </SelectButton>
       <Modal animationType='fade' transparent={true} visible={showOptions}>
@@ -50,10 +55,17 @@ const SelectField: React.FC<SelectFieldProps> = ({
                     }}
                   >
                     <SelectButtonText
-                      style={{ fontFamily: 'OpenSans-Regular', color: 'white' }}
+                      style={{
+                        fontFamily: 'OpenSans-Regular',
+                        color: themeContext.colors.colorBackground
+                      }}
                     >
                       {selected?.name === item.name ? (
-                        <Feather name='check' size={18} color='white' />
+                        <Feather
+                          name='check'
+                          size={18}
+                          color={themeContext.colors.colorBackground}
+                        />
                       ) : null}
                       {item.name}
                     </SelectButtonText>
@@ -97,7 +109,7 @@ const SelectListOptions = styled.View`
   justify-content: flex-start;
   border-radius: 10px;
   padding: 10px 12px;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: ${({ theme }) => theme.colors.colorText};
   margin-bottom: 120px;
 `
 

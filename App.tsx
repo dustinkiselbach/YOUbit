@@ -1,10 +1,14 @@
 import React from 'react'
-import { ThemeProvider } from 'styled-components'
+
 import { LoadAssets } from './src/components'
 import { AuthStack, MainTab } from './src/navigators'
-import { myTheme } from './src/themes/myTheme'
+
 import { ApolloProvider } from '@apollo/client'
-import { AuthContextProvider, useAuthStateContext } from './src/context'
+import {
+  AuthContextProvider,
+  useAuthStateContext,
+  ThemeContextProvider
+} from './src/context'
 import { client } from './src/utils'
 import { Onboarding } from './src/screens'
 
@@ -19,13 +23,13 @@ const fonts = {
 const App: React.FC = () => {
   return (
     <ApolloProvider {...{ client }}>
-      <AuthContextProvider>
-        <ThemeProvider theme={myTheme}>
-          <LoadAssets {...{ fonts }}>
+      <LoadAssets {...{ fonts }}>
+        <AuthContextProvider>
+          <ThemeContextProvider>
             <NavigationFlow />
-          </LoadAssets>
-        </ThemeProvider>
-      </AuthContextProvider>
+          </ThemeContextProvider>
+        </AuthContextProvider>
+      </LoadAssets>
     </ApolloProvider>
   )
 }

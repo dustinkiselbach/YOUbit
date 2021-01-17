@@ -4,6 +4,9 @@ import { HabitArchive, HabitCreate, HabitReminders, Settings } from '../screens'
 import HabitStack from './HabitStack'
 import { MainTabParamList } from '../types'
 import { Feather } from '@expo/vector-icons'
+import { ThemeContext } from '../../styled-components'
+import { useContext } from 'react'
+import { rgba } from 'polished'
 
 function getIcon (
   route: keyof MainTabParamList
@@ -27,6 +30,7 @@ function getIcon (
 const Tab = createBottomTabNavigator<MainTabParamList>()
 
 const MainTab: React.FC = () => {
+  const themeContext = useContext(ThemeContext)
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -40,8 +44,12 @@ const MainTab: React.FC = () => {
       })}
       tabBarOptions={{
         labelStyle: { fontFamily: 'OpenSans-Regular' },
-        activeTintColor: '#00C2CB',
-        inactiveTintColor: '#535353'
+        activeTintColor: themeContext.colors.colorPrimary,
+        inactiveTintColor: themeContext.colors.colorText,
+        style: {
+          backgroundColor: themeContext.colors.colorBackground,
+          borderTopColor: rgba(themeContext.colors.colorText, 0.5)
+        }
       }}
     >
       <Tab.Screen name='Habits' component={HabitStack} />

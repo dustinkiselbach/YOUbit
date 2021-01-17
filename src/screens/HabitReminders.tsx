@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, FlatList, Modal } from 'react-native'
-import styled from '../../styled-components'
+import styled, { ThemeContext } from '../../styled-components'
 
 import {
   Button,
@@ -9,7 +9,7 @@ import {
   ReminderCard,
   SelectField,
   Spacer,
-  Text
+  Title
 } from '../components'
 import { Feather } from '@expo/vector-icons'
 import { Formik } from 'formik'
@@ -47,6 +47,7 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
     },
     fetchPolicy: 'cache-and-network'
   })
+  const themeContext = useContext(ThemeContext)
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -70,7 +71,7 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
   return (
     <Container>
       <Top>
-        <Text variant='h1'>Reminders</Text>
+        <Title>Reminders</Title>
         {none && !loading ? (
           <ReminderIcon
             onPress={() => {
@@ -85,11 +86,19 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
               }
             }}
           >
-            <Feather name='plus' size={24} color='#535353' />
+            <Feather
+              name='plus'
+              size={24}
+              color={themeContext.colors.colorText}
+            />
           </ReminderIcon>
         ) : (
           <ReminderIcon onPress={() => setUpdating(isUpdating => !isUpdating)}>
-            <Feather name='edit' size={24} color='#535353' />
+            <Feather
+              name='edit'
+              size={24}
+              color={themeContext.colors.colorText}
+            />
           </ReminderIcon>
         )}
       </Top>
@@ -123,7 +132,11 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
                   }
                 }}
               >
-                <Feather name='plus' size={24} color='#535353' />
+                <Feather
+                  name='plus'
+                  size={24}
+                  color={themeContext.colors.colorText}
+                />
               </ReminderIcon>
             )
           }
@@ -156,7 +169,11 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
                 setShowReminderModal(false)
               }}
             >
-              <Feather name='x' size={24} color='#535353' />
+              <Feather
+                name='x'
+                size={24}
+                color={themeContext.colors.colorText}
+              />
             </ModalIcon>
             <Formik
               enableReinitialize
@@ -259,7 +276,7 @@ const CenteredView = styled.View`
 
 const ModalContainer = styled.View`
   padding: 20px;
-  background-color: white;
+  background-color: ${({ theme }) => theme.colors.colorModalBackground};
   width: 75%;
   position: relative;
 `

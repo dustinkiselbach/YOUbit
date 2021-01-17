@@ -2,7 +2,6 @@ import React from 'react'
 import { View, FlatList } from 'react-native'
 import Text from './Text'
 import styled from '../../styled-components'
-import { lighten } from 'polished'
 import { setDay } from 'date-fns'
 
 interface DatesProps {
@@ -39,9 +38,7 @@ const Dates: React.FC<DatesProps> = ({ dates, selected, changeSelected }) => {
 const Day = styled.TouchableOpacity<{ selected: boolean }>`
   align-items: center;
   background-color: ${props =>
-    props.selected
-      ? lighten(0.4, props.theme.colors.colorPrimary)
-      : 'transparent'};
+    props.selected ? props.theme.colors.contrastColorPrimary : 'transparent'};
   padding: 8px;
   border-radius: 2px;
 `

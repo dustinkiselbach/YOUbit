@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import Text from './Text'
-import styled from '../../styled-components'
+import styled, { ThemeContext } from '../../styled-components'
 import { Feather } from '@expo/vector-icons'
 import { Alert, Animated } from 'react-native'
 import {
@@ -27,6 +27,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({
   onUpdate
 }) => {
   const { params } = useRoute<MainTabNav<'HabitReminders'>['route']>()
+  const themeContext = useContext(ThemeContext)
 
   const [destroyReminder] = useDestroyReminderMutation()
   // Wiggle Animation
@@ -74,7 +75,11 @@ const ReminderCard: React.FC<ReminderCardProps> = ({
             style={{ marginRight: 8 }}
             onPress={() => onUpdate(id, timeAsDate)}
           >
-            <Feather name='edit-2' size={24} color='#535353' />
+            <Feather
+              name='edit-2'
+              size={24}
+              color={themeContext.colors.colorText}
+            />
           </ReminderCardIcon>
           <ReminderCardIcon
             onPress={() => {
@@ -120,7 +125,11 @@ const ReminderCard: React.FC<ReminderCardProps> = ({
               ])
             }}
           >
-            <Feather name='trash' size={24} color='#535353' />
+            <Feather
+              name='trash'
+              size={24}
+              color={themeContext.colors.colorText}
+            />
           </ReminderCardIcon>
         </Icons>
       ) : null}

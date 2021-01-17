@@ -8,8 +8,8 @@ import {
   RadioFieldGroup,
   SectionSpacer,
   Spacer,
-  Text,
-  TextField
+  TextField,
+  Title
 } from '../components'
 import { MainTabNav } from '../types'
 import {
@@ -38,9 +38,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
   return (
     <Container>
       <SectionSpacer>
-        <Text variant='h1' style={{ marginBottom: 16 }}>
-          Add Habit
-        </Text>
+        <Title>Add Habit</Title>
         <Formik
           validateOnBlur={false}
           validateOnChange={false}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { FlatList, Alert, ActivityIndicator } from 'react-native'
-import styled from '../../styled-components'
-import { Container, Text } from '../components'
+import styled, { ThemeContext } from '../../styled-components'
+import { Container, Text, Title } from '../components'
 import {
   ArchivedHabitsDocument,
   RemindersIndexDocument,
@@ -11,6 +11,7 @@ import {
 } from '../generated/graphql'
 import { daysOfWeek, useLogout } from '../utils'
 import { Feather } from '@expo/vector-icons'
+import { useContext } from 'react'
 
 const HabitArchive: React.FC = () => {
   const [logout] = useLogout()
@@ -22,6 +23,7 @@ const HabitArchive: React.FC = () => {
       dayOfWeek: (daysOfWeek as unknown) as string[]
     }
   })
+  const themeContext = useContext(ThemeContext)
 
   if (error) {
     logout()
@@ -29,9 +31,7 @@ const HabitArchive: React.FC = () => {
 
   return (
     <Container>
-      <Text variant='h1' style={{ marginTop: 16 }}>
-        Archive
-      </Text>
+      <Title>Archive</Title>
       {!data?.habitIndex.length && !loading ? (
         <Text variant='h4' style={{ marginTop: 16 }}>
           Nothing currently archived
@@ -75,7 +75,11 @@ const HabitArchive: React.FC = () => {
                   ])
                 }}
               >
-                <Feather name='plus' size={24} color='#535353' />
+                <Feather
+                  name='plus'
+                  size={24}
+                  color={themeContext.colors.colorText}
+                />
               </ArchivedHabitIcon>
               <ArchivedHabitIcon
                 onPress={() => {
@@ -112,7 +116,11 @@ const HabitArchive: React.FC = () => {
                   ])
                 }}
               >
-                <Feather name='trash' size={24} color='#535353' />
+                <Feather
+                  name='trash'
+                  size={24}
+                  color={themeContext.colors.colorText}
+                />
               </ArchivedHabitIcon>
             </ArchivedHabitItem>
           )}

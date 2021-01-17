@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { TouchableOpacityProps } from 'react-native'
-import styled from '../../styled-components'
+import styled, { ThemeContext } from '../../styled-components'
 import { Feather, FontAwesome5 } from '@expo/vector-icons'
 import { isFuture } from 'date-fns'
 import {
@@ -63,12 +63,13 @@ const HabitCard: React.FC<HabitCardProps> = ({
   const [archiveOrActivateHabit] = useArchiveOrActivateHabitMutation()
   const [createHabitLog] = useCreateHabitLogMutation()
   const [destroyHabitLog] = useDestroyHabitLogMutation()
+  const themeContext = useContext(ThemeContext)
 
   if (showMore) {
     return (
       <HabitMore>
         <Close onPress={() => setShowMore(false)}>
-          <Feather name='x' size={24} color='#535353' />
+          <Feather name='x' size={24} color={themeContext.colors.colorText} />
         </Close>
         <HabitCardButton
           onPress={() => {
@@ -209,7 +210,11 @@ const HabitCard: React.FC<HabitCardProps> = ({
       </HabitCardText>
 
       <More onPress={() => setShowMore(true)}>
-        <Feather name='more-vertical' size={24} color='#535353' />
+        <Feather
+          name='more-vertical'
+          size={24}
+          color={themeContext.colors.colorText}
+        />
       </More>
     </_HabitCard>
   )

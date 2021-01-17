@@ -1,6 +1,6 @@
-import React from 'react'
-import styled from '../../styled-components'
-import { Container, Text, HabitCompleted, Spacer } from '../components'
+import React, { useContext } from 'react'
+import styled, { ThemeContext } from '../../styled-components'
+import { Container, Text, HabitCompleted, Spacer, Title } from '../components'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { Feather } from '@expo/vector-icons'
 
@@ -41,6 +41,7 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
   })
   const [createHabitLog] = useCreateHabitLogMutation()
   const [destroyHabitLog] = useDestroyHabitLogMutation()
+  const themeContext = useContext(ThemeContext)
 
   const habit = data?.habitIndex.filter(habit => habit.id === id)
 
@@ -62,13 +63,13 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
     <Container notSafe>
       <_HabitDetail>
         <HabitDetailTop>
-          <Text variant='h1'>{name}</Text>
-          <Spacer>
-            <Text variant='h5' style={{ marginBottom: 4 }}>
-              {habitType}
-            </Text>
-            <Text variant='p'>{frequency.map(day => day + ' ')}</Text>
-          </Spacer>
+          <Title>{name}</Title>
+
+          <Text variant='h5' style={{ marginBottom: 4 }}>
+            {habitType}
+          </Text>
+          <Text variant='p'>{frequency.map(day => day + ' ')}</Text>
+
           <Spacer>
             <HabitCompletedContainer>
               <HabitCompleted
@@ -193,7 +194,11 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
                 )
               }
             >
-              <Feather name='plus' size={24} color='#535353' />
+              <Feather
+                name='plus'
+                size={24}
+                color={themeContext.colors.colorText}
+              />
             </DetailIcon>
           </HabitDetailReminders>
         </Spacer>

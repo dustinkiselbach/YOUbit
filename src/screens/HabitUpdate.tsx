@@ -11,7 +11,8 @@ import {
   CheckWeekFieldGroup,
   DatePickerField,
   Text,
-  Button
+  Button,
+  Title
 } from '../components'
 import {
   useHabitIndexQuery,
@@ -53,9 +54,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
   return (
     <Container notSafe>
       <SectionSpacer>
-        <Text variant='h1' style={{ marginBottom: 16 }}>
-          Update Habit
-        </Text>
+        <Title>Update Habit</Title>
         <Formik
           enableReinitialize
           validateOnBlur={false}

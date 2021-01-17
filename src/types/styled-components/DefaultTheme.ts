@@ -8,5 +8,7 @@ export default interface DefaultTheme {
     colorLightGrey: string
     colorBackground: string
     colorDanger: string
+    contrastColorPrimary: string
+    colorModalBackground: string
   }
 }

@@ -12,6 +12,8 @@ import {
 import { client } from './src/utils'
 import { Onboarding } from './src/screens'
 
+// habit completed showing filled while it shouldn't be
+
 const fonts = {
   'OpenSans-Bold': require('./assets/fonts/OpenSans-Bold.ttf'),
   'OpenSans-Light': require('./assets/fonts/OpenSans-Light.ttf'),

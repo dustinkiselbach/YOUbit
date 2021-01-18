@@ -10,5 +10,7 @@ export default interface DefaultTheme {
     colorDanger: string
     contrastColorPrimary: string
     colorModalBackground: string
+    colorPlaceholder: string
+    colorLightGreySelected: string
   }
 }

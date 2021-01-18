@@ -2,6 +2,7 @@ query remindersIndex {
   remindersIndex {
     habit {
       name
+      id
     }
     id
     remindAt

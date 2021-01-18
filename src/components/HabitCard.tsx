@@ -4,6 +4,7 @@ import styled, { ThemeContext } from '../../styled-components'
 import { Feather, FontAwesome5 } from '@expo/vector-icons'
 import { isFuture } from 'date-fns'
 import {
+  ArchivedHabitsDocument,
   HabitIndexDocument,
   HabitIndexQuery,
   useArchiveOrActivateHabitMutation,
@@ -92,13 +93,22 @@ const HabitCard: React.FC<HabitCardProps> = ({
                     habitId: id,
                     active: false
                   },
+                  refetchQueries: [
+                    {
+                      query: ArchivedHabitsDocument,
+                      variables: {
+                        active: false,
+                        dayOfWeek: (daysOfWeek as unknown) as string[]
+                      }
+                    }
+                  ],
                   update: (store, { data }) => {
                     const habitData = store.readQuery<HabitIndexQuery>({
                       query: HabitIndexDocument,
                       variables: {
-                        dayOfWeek: [daysOfWeek[day.getDay()]],
+                        dayOfWeek,
                         active: true,
-                        selectedDate: day.toISOString().split('T')[0]
+                        selectedDate: dateString
                       }
                     })
 
@@ -114,7 +124,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
                     store.writeQuery<HabitIndexQuery>({
                       query: HabitIndexDocument,
                       variables: {
-                        dayOfWeek: [daysOfWeek[day.getDay()]],
+                        dayOfWeek,
                         active: true
                       },
                       data: {

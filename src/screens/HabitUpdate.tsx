@@ -1,10 +1,10 @@
 import { ApolloError } from '@apollo/client'
+import { useHeaderHeight } from '@react-navigation/stack'
 import { Formik } from 'formik'
 import React from 'react'
 
 import {
   Container,
-  SectionSpacer,
   Spacer,
   RadioFieldGroup,
   TextField,
@@ -12,7 +12,8 @@ import {
   DatePickerField,
   Text,
   Button,
-  Title
+  Title,
+  KeyboardAvoidingScrollView
 } from '../components'
 import {
   useHabitIndexQuery,
@@ -37,6 +38,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
   })
   const [updateHabit] = useUpdateHabitMutation()
   const [logout] = useLogout()
+  const headerHeight = useHeaderHeight()
 
   const habit = data?.habitIndex.filter(habit => habit.id === id)
 
@@ -53,7 +55,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
 
   return (
     <Container notSafe>
-      <SectionSpacer>
+      <KeyboardAvoidingScrollView {...{ headerHeight }}>
         <Title>Update Habit</Title>
         <Formik
           enableReinitialize
@@ -162,7 +164,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
             </>
           )}
         </Formik>
-      </SectionSpacer>
+      </KeyboardAvoidingScrollView>
     </Container>
   )
 }

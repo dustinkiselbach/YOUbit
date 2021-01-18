@@ -85,7 +85,7 @@ export type Device = {
   __typename?: 'Device';
   /** The name of the device. */
   clientIdentifier?: Maybe<Scalars['String']>;
-  /** The DateTime value of when the Device was created. */
+  /** The DateTime value of when the Device was created */
   createdAt: Scalars['ISO8601DateTime'];
   /** The Unique Identifier for the Device. */
   id: Scalars['ID'];
@@ -93,7 +93,7 @@ export type Device = {
   platform: Scalars['String'];
   /** The Expo Push Token. */
   token: Scalars['String'];
-  /** The DateTime value of when the Device was updated. */
+  /** The DateTime value of when the Device was updated */
   updatedAt: Scalars['ISO8601DateTime'];
   /** The User the device belongs to. */
   user: User;
@@ -795,7 +795,7 @@ export type RemindersIndexQuery = (
     & Pick<Reminder, 'id' | 'remindAt'>
     & { habit: (
       { __typename?: 'Habit' }
-      & Pick<Habit, 'name'>
+      & Pick<Habit, 'name' | 'id'>
     ) }
   )> }
 );
@@ -1575,6 +1575,7 @@ export const RemindersIndexDocument = gql`
   remindersIndex {
     habit {
       name
+      id
     }
     id
     remindAt

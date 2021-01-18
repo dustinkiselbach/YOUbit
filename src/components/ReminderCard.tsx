@@ -16,13 +16,15 @@ interface ReminderCardProps {
   name: string
   time: Date
   id: string
-  onUpdate: (id: string, time: Date) => void
+  habitId: string
+  onUpdate: (reminderId: string, habitId: string, time: Date) => void
 }
 
 const ReminderCard: React.FC<ReminderCardProps> = ({
   name,
   time,
   id,
+  habitId,
   updating,
   onUpdate
 }) => {
@@ -73,7 +75,7 @@ const ReminderCard: React.FC<ReminderCardProps> = ({
         <Icons>
           <ReminderCardIcon
             style={{ marginRight: 8 }}
-            onPress={() => onUpdate(id, timeAsDate)}
+            onPress={() => onUpdate(id, habitId, timeAsDate)}
           >
             <Feather
               name='edit-2'

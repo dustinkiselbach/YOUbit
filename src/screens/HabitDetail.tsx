@@ -208,9 +208,7 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
 }
 
 const _HabitDetail = styled.ScrollView``
-const HabitDetailTop = styled.View`
-  margin-top: 16px;
-`
+const HabitDetailTop = styled.View``
 const HabitDetailStreaks = styled.View``
 const StreakItems = styled.View`
   flex-direction: row;

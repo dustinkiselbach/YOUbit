@@ -1,10 +1,10 @@
-import React from 'react'
-import { FlatList, Alert, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
+import { FlatList, Alert, ActivityIndicator, View } from 'react-native'
 import styled, { ThemeContext } from '../../styled-components'
-import { Container, Text, Title } from '../components'
+import { Container, SectionSpacer, Text, Title } from '../components'
 import {
   ArchivedHabitsDocument,
-  RemindersIndexDocument,
+  ArchivedHabitsQuery,
   useArchivedHabitsQuery,
   useArchiveOrActivateHabitMutation,
   useDestroyHabitMutation
@@ -13,7 +13,11 @@ import { daysOfWeek, useLogout } from '../utils'
 import { Feather } from '@expo/vector-icons'
 import { useContext } from 'react'
 
+// @todo weird cache stuff when changing multiple items
+// needs to be refactored
+
 const HabitArchive: React.FC = () => {
+  const [selected, setSelected] = useState<string[]>([])
   const [logout] = useLogout()
   const [destroyHabit] = useDestroyHabitMutation()
   const [archiveOrActivateHabit] = useArchiveOrActivateHabitMutation()
@@ -24,6 +28,7 @@ const HabitArchive: React.FC = () => {
     }
   })
   const themeContext = useContext(ThemeContext)
+  const hasSelectedAny = selected.length > 0
 
   if (error) {
     logout()
@@ -31,48 +36,47 @@ const HabitArchive: React.FC = () => {
 
   return (
     <Container>
-      <Title>Archive</Title>
-      {!data?.habitIndex.length && !loading ? (
-        <Text variant='h4' style={{ marginTop: 16 }}>
-          Nothing currently archived
-        </Text>
-      ) : loading ? (
-        <ActivityIndicator size='large' color='#00C2CB' />
-      ) : (
-        <FlatList
-          data={data?.habitIndex}
-          renderItem={({ item }) => (
-            <ArchivedHabitItem>
-              <Text variant='h5' style={{ flex: 1 }}>
-                {item.name}
-              </Text>
+      <SectionSpacer>
+        <Top>
+          <Title>Archive</Title>
+          {hasSelectedAny ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <ArchivedHabitIcon
                 onPress={() => {
-                  Alert.alert('Unarchive', `Unarchive ${item.name}?`, [
-                    {
-                      text: 'Cancel',
-                      style: 'cancel'
-                    },
-                    {
-                      text: 'OK',
-                      onPress: async () => {
-                        try {
-                          await archiveOrActivateHabit({
-                            variables: {
-                              habitId: item.id,
-                              active: true
-                            },
-                            // too much stuff to update *shrug*
-                            update: async store => {
-                              await store.reset()
+                  Alert.alert(
+                    'Unarchive',
+                    `Unarchive ${selected.length} habit${
+                      selected.length > 1 ? 's' : ''
+                    }?`,
+                    [
+                      {
+                        text: 'Cancel',
+                        style: 'cancel'
+                      },
+                      {
+                        text: 'OK',
+                        onPress: async () => {
+                          try {
+                            for (const id of selected) {
+                              await archiveOrActivateHabit({
+                                variables: {
+                                  habitId: id,
+                                  active: true
+                                },
+                                // too much stuff to update *shrug*
+                                update: async store => {
+                                  await store.reset()
+                                }
+                              })
                             }
-                          })
-                        } catch (err) {
-                          console.log((err as Error).message)
+                            setSelected([])
+                          } catch (err) {
+                            console.log((err as Error).message)
+                          }
                         }
                       }
-                    }
-                  ])
+                    ]
+                  )
                 }}
               >
                 <Feather
@@ -83,37 +87,64 @@ const HabitArchive: React.FC = () => {
               </ArchivedHabitIcon>
               <ArchivedHabitIcon
                 onPress={() => {
-                  Alert.alert('Delete Habit', `Delete ${item.name} Forever?`, [
-                    {
-                      text: 'Cancel',
-                      style: 'cancel'
-                    },
-                    {
-                      text: 'OK',
-                      onPress: async () => {
-                        try {
-                          await destroyHabit({
-                            variables: { habitId: item.id },
-                            refetchQueries: [
-                              {
-                                query: ArchivedHabitsDocument,
-                                variables: {
-                                  active: false,
-                                  dayOfWeek: (daysOfWeek as unknown) as string[]
-                                }
-                              },
-                              {
-                                query: RemindersIndexDocument
-                              }
-                            ]
-                          })
-                        } catch (err) {
-                          console.log(err)
-                        }
+                  Alert.alert(
+                    'Delete',
+                    `Delete ${selected.length} habit${
+                      selected.length > 1 ? 's' : ''
+                    } forever?`,
+                    [
+                      {
+                        text: 'Cancel',
+                        style: 'cancel'
                       },
-                      style: 'destructive'
-                    }
-                  ])
+                      {
+                        text: 'OK',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            for (const id of selected) {
+                              await destroyHabit({
+                                variables: { habitId: id },
+                                update: (store, { data }) => {
+                                  const archivedHabits = store.readQuery<
+                                    ArchivedHabitsQuery
+                                  >({
+                                    query: ArchivedHabitsDocument,
+                                    variables: {
+                                      active: false,
+                                      dayOfWeek: (daysOfWeek as unknown) as string[]
+                                    }
+                                  })
+
+                                  if (archivedHabits) {
+                                    const newArchivedHabits = archivedHabits.habitIndex.filter(
+                                      habit =>
+                                        habit.id !==
+                                        data?.destroyHabit?.habit.id
+                                    )
+
+                                    store.writeQuery<ArchivedHabitsQuery>({
+                                      query: ArchivedHabitsDocument,
+                                      variables: {
+                                        active: false,
+                                        dayOfWeek: (daysOfWeek as unknown) as string[]
+                                      },
+                                      data: {
+                                        habitIndex: newArchivedHabits
+                                      }
+                                    })
+                                  }
+                                }
+                              })
+                            }
+                            setSelected([])
+                          } catch (err) {
+                            console.log((err as Error).message)
+                          }
+                        }
+                      }
+                    ]
+                  )
                 }}
               >
                 <Feather
@@ -122,16 +153,178 @@ const HabitArchive: React.FC = () => {
                   color={themeContext.colors.colorText}
                 />
               </ArchivedHabitIcon>
-            </ArchivedHabitItem>
-          )}
-        />
-      )}
+              <Text variant='h4' style={{ padding: 8 }}>
+                {selected.length}
+              </Text>
+            </View>
+          ) : null}
+        </Top>
+        {!data?.habitIndex.length && !loading ? (
+          <Text variant='h4'>Nothing currently archived</Text>
+        ) : loading ? (
+          <ActivityIndicator
+            size='large'
+            color={themeContext.colors.colorPrimary}
+          />
+        ) : (
+          <FlatList
+            data={data?.habitIndex}
+            contentContainerStyle={{
+              paddingHorizontal: hasSelectedAny ? 16 : 0
+            }}
+            renderItem={({ item }) => {
+              const isSelected = selected.indexOf(item.id) !== -1
+
+              return (
+                <ArchivedHabitItem
+                  isSelected={isSelected}
+                  onLongPress={() =>
+                    setSelected(currSelected =>
+                      currSelected.indexOf(item.id) === -1
+                        ? [...currSelected, item.id]
+                        : currSelected
+                    )
+                  }
+                  onPress={() => {
+                    if (hasSelectedAny) {
+                      if (isSelected) {
+                        setSelected(currSelected =>
+                          currSelected.filter(cs => cs !== item.id)
+                        )
+                      } else {
+                        setSelected(currSelected => [...currSelected, item.id])
+                      }
+                    }
+                  }}
+                >
+                  <Text variant='h5' style={{ flex: 1 }}>
+                    {item.name}
+                  </Text>
+                  {hasSelectedAny ? null : (
+                    <>
+                      <ArchivedHabitIcon
+                        onPress={() => {
+                          Alert.alert('Unarchive', `Unarchive ${item.name}?`, [
+                            {
+                              text: 'Cancel',
+                              style: 'cancel'
+                            },
+                            {
+                              text: 'OK',
+                              onPress: async () => {
+                                try {
+                                  await archiveOrActivateHabit({
+                                    variables: {
+                                      habitId: item.id,
+                                      active: true
+                                    },
+                                    // too much stuff to update *shrug*
+                                    update: async store => {
+                                      await store.reset()
+                                    }
+                                  })
+                                } catch (err) {
+                                  console.log((err as Error).message)
+                                }
+                              }
+                            }
+                          ])
+                        }}
+                      >
+                        <Feather
+                          name='plus'
+                          size={24}
+                          color={themeContext.colors.colorText}
+                        />
+                      </ArchivedHabitIcon>
+                      <ArchivedHabitIcon
+                        onPress={() => {
+                          Alert.alert(
+                            'Delete Habit',
+                            `Delete ${item.name} Forever?`,
+                            [
+                              {
+                                text: 'Cancel',
+                                style: 'cancel'
+                              },
+                              {
+                                text: 'OK',
+                                onPress: async () => {
+                                  try {
+                                    await destroyHabit({
+                                      variables: { habitId: item.id },
+                                      update: (store, { data }) => {
+                                        const archivedHabits = store.readQuery<
+                                          ArchivedHabitsQuery
+                                        >({
+                                          query: ArchivedHabitsDocument,
+                                          variables: {
+                                            active: false,
+                                            dayOfWeek: (daysOfWeek as unknown) as string[]
+                                          }
+                                        })
+
+                                        if (archivedHabits) {
+                                          const newArchivedHabits = archivedHabits.habitIndex.filter(
+                                            habit =>
+                                              habit.id !==
+                                              data?.destroyHabit?.habit.id
+                                          )
+
+                                          store.writeQuery<ArchivedHabitsQuery>(
+                                            {
+                                              query: ArchivedHabitsDocument,
+                                              variables: {
+                                                active: false,
+                                                dayOfWeek: (daysOfWeek as unknown) as string[]
+                                              },
+                                              data: {
+                                                habitIndex: newArchivedHabits
+                                              }
+                                            }
+                                          )
+                                        }
+                                      }
+                                    })
+                                  } catch (err) {
+                                    console.log(err)
+                                  }
+                                },
+                                style: 'destructive'
+                              }
+                            ]
+                          )
+                        }}
+                      >
+                        <Feather
+                          name='trash'
+                          size={24}
+                          color={themeContext.colors.colorText}
+                        />
+                      </ArchivedHabitIcon>
+                    </>
+                  )}
+                </ArchivedHabitItem>
+              )
+            }}
+          />
+        )}
+      </SectionSpacer>
     </Container>
   )
 }
 
-const ArchivedHabitItem = styled.View`
-  background-color: ${({ theme }) => theme.colors.colorLightGrey};
+const Top = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const ArchivedHabitItem = styled.TouchableOpacity<{ isSelected: boolean }>`
+  background-color: ${({ theme, isSelected }) =>
+    isSelected
+      ? theme.colors.colorLightGreySelected
+      : theme.colors.colorLightGrey};
   margin: 8px 0;
   padding: 10px 12px;
   flex-direction: row;

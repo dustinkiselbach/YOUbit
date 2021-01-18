@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "762701204052",
+    "project_id": "youbit-2734b",
+    "storage_bucket": "youbit-2734b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762701204052:android:4c417b1cb56bf978bd7bc1",
+        "android_client_info": {
+          "package_name": "com.dustinkiselbach.YOUbithabittracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "762701204052-pbvm3brntiuuvpi2istms7bnfukqgi8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRC3259Rs-iMoNu-nOXxTFd-6RVIFbRWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "762701204052-pbvm3brntiuuvpi2istms7bnfukqgi8k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,5 @@
 // my-theme.ts
-import { lighten } from 'polished'
+import { darken, lighten } from 'polished'
 import { DefaultTheme } from '../types'
 
 export const myTheme: DefaultTheme = {
@@ -13,6 +13,8 @@ export const myTheme: DefaultTheme = {
     colorBackground: '#ffffff',
     colorDanger: '#dc3545',
     contrastColorPrimary: lighten(0.4, '#00C2CB'),
-    colorModalBackground: '#ffffff'
+    colorModalBackground: '#ffffff',
+    colorPlaceholder: '#8e8e8e',
+    colorLightGreySelected: darken(0.1, '#535353')
   }
 }

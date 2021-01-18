@@ -22,8 +22,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.dustinkiselbach.YOUBithabittracker",
-      "useNextNotificationsApi": true
+      "package": "com.dustinkiselbach.YOUbithabittracker",
+      "useNextNotificationsApi": true,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"

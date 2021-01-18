@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useField } from 'formik'
-import styled from '../../styled-components'
+import styled, { ThemeContext } from '../../styled-components'
 import { TextInputProps } from 'react-native'
 import Error from './Error'
 import Label from './Label'
@@ -12,6 +12,7 @@ interface TextFieldProps extends TextInputProps {
 
 const TextField: React.FC<TextFieldProps> = ({ name, label, ...props }) => {
   const [field, meta, { setValue }] = useField({ name })
+  const themeContext = useContext(ThemeContext)
   // @todo change label color
 
   return (
@@ -22,6 +23,7 @@ const TextField: React.FC<TextFieldProps> = ({ name, label, ...props }) => {
         value={field.value}
         onChangeText={t => setValue(t)}
         placeholder={label}
+        placeholderTextColor={themeContext.colors.colorPlaceholder}
       />
       {meta.error ? <Error>{meta.error}</Error> : null}
     </>

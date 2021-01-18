@@ -5,13 +5,14 @@ import { HabitStackParamList } from '../types'
 import { ThemeContext } from '../../styled-components'
 
 const Stack = createStackNavigator<HabitStackParamList>()
-
+// MainStack.Navigator detachInactiveScreens={false} screenOptions={{ animationEnabled: false }}
 const HabitStack: React.FC = () => {
   const themeContext = useContext(ThemeContext)
   return (
     <Stack.Navigator
       screenOptions={{
         title: '',
+        headerTintColor: themeContext.colors.colorSecondary,
         headerStyle: {
           backgroundColor: themeContext.colors.colorBackground,
           elevation: 0

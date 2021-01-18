@@ -12,7 +12,7 @@ interface TextFieldProps extends TextInputProps {
 
 const TextField: React.FC<TextFieldProps> = ({ name, label, ...props }) => {
   const [field, meta, { setValue }] = useField({ name })
-  // console.log(meta)
+  // @todo change label color
 
   return (
     <>

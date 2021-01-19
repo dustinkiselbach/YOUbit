@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import { HabitDetail, Habits, HabitUpdate } from '../screens'
+import { HabitCategories, HabitDetail, Habits, HabitUpdate } from '../screens'
 import { HabitStackParamList } from '../types'
 import { ThemeContext } from '../../styled-components'
 
@@ -26,6 +26,7 @@ const HabitStack: React.FC = () => {
       />
       <Stack.Screen name='HabitDetail' component={HabitDetail} />
       <Stack.Screen name='HabitUpdate' component={HabitUpdate} />
+      <Stack.Screen name='HabitCategories' component={HabitCategories} />
     </Stack.Navigator>
   )
 }

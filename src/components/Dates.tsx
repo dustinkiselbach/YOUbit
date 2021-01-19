@@ -12,7 +12,7 @@ interface DatesProps {
 
 const Dates: React.FC<DatesProps> = ({ dates, selected, changeSelected }) => {
   return (
-    <View style={{ marginTop: 16 }}>
+    <View>
       <FlatList
         data={dates}
         renderItem={({ item, index }) => (

@@ -2,6 +2,7 @@ import { Formik } from 'formik'
 import React from 'react'
 import {
   Button,
+  CategoryTextAndSelectField,
   CheckWeekFieldGroup,
   Container,
   DatePickerField,
@@ -19,7 +20,8 @@ import {
   HabitIndexQuery,
   useCategoriesIndexQuery,
   ArchivedHabitsQuery,
-  ArchivedHabitsDocument
+  ArchivedHabitsDocument,
+  CategoriesIndexDocument
 } from '../generated/graphql'
 import { ApolloError } from '@apollo/client'
 
@@ -31,11 +33,9 @@ const getIndexOfDay = (day: typeof daysOfWeek[number]): number => {
 }
 
 const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
-  const { data } = useCategoriesIndexQuery()
+  const { data: categoriesData } = useCategoriesIndexQuery()
   const [createHabit] = useCreateHabitMutation()
   const [logout] = useLogout()
-
-  console.log('categories query ' + data)
 
   return (
     <Container>
@@ -49,6 +49,7 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
               habitType: '',
               name: '',
               period: '',
+              category: '',
               frequency: [],
               startDate: new Date()
             }}
@@ -62,8 +63,9 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                       values.period === 'daily' ? ['daily'] : values.frequency,
                     startDate: values.startDate,
                     // @todo allow categories
-                    categoryName: 'fart'
+                    categoryName: values.category
                   },
+                  refetchQueries: [{ query: CategoriesIndexDocument }],
 
                   // always dependant on variables
                   // going to loop through and revalidate based on days in frequency array
@@ -184,6 +186,15 @@ const HabitCreate: React.FC<MainTabNav<'HabitCreate'>> = ({ navigation }) => {
                     label='Name'
                     autoCapitalize='words'
                     textContentType='name'
+                  />
+                </Spacer>
+                <Spacer>
+                  <CategoryTextAndSelectField
+                    name='category'
+                    label='Category'
+                    autoCapitalize='words'
+                    textContentType='nickname'
+                    options={categoriesData}
                   />
                 </Spacer>
                 <Spacer>

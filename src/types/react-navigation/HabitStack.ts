@@ -16,7 +16,8 @@ type HabitDetailAndUpdateProps = {
 }
 
 export type HabitStackParamList = {
-  HabitsList: undefined
+  HabitsList: undefined | { category?: string }
+  HabitCategories: undefined
   HabitDetail: HabitDetailAndUpdateProps
   HabitUpdate: HabitDetailAndUpdateProps
 }

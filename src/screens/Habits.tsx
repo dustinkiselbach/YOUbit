@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import { ActivityIndicator } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ca } from 'date-fns/locale'
+import React, { useContext, useState } from 'react'
+import { ActivityIndicator, View } from 'react-native'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
+import { ThemeContext } from '../../styled-components'
 import { Container, Dates, HabitCard, SectionSpacer, Text } from '../components'
 import { useHabitIndexQuery } from '../generated/graphql'
 import { HabitStackNav } from '../types'
@@ -9,7 +11,10 @@ import { daysOfWeek, getCurrentWeek, useLogout } from '../utils'
 const currentWeek = getCurrentWeek()
 // console.log(format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"))
 
-const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
+const Habits: React.FC<HabitStackNav<'HabitsList'>> = ({
+  navigation,
+  route
+}) => {
   const [logout] = useLogout()
   const [day, setDay] = useState(new Date())
 
@@ -20,6 +25,8 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
       selectedDate: currentWeek[day.getDay()].toISOString().split('T')[0]
     }
   })
+  const themeContext = useContext(ThemeContext)
+  const category = route.params?.category
 
   if (error) {
     logout()
@@ -28,10 +35,14 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
   const none = !data?.habitIndex.length
 
   const completedActivities = data?.habitIndex.filter(
-    ({ isLogged: { logged } }) => logged
+    ({ category: { name }, isLogged: { logged } }) => {
+      return logged && (!category || category === name)
+    }
   )
   const notCompletedActivities = data?.habitIndex.filter(
-    ({ isLogged: { logged } }) => !logged
+    ({ category: { name }, isLogged: { logged } }) => {
+      return !logged && (!category || category === name)
+    }
   )
 
   let allActivities: JSX.Element | null = null
@@ -60,6 +71,28 @@ const Habits: React.FC<HabitStackNav<'HabitsList'>> = () => {
 
   return (
     <Container>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 8
+        }}
+      >
+        <Text variant='h3'>{category ? category : 'All Habits'}</Text>
+        <TouchableOpacity
+          style={{ marginLeft: 'auto' }}
+          onPress={() => navigation.navigate('HabitCategories')}
+        >
+          <Text
+            variant='p'
+            style={{ color: themeContext.colors.colorSecondary }}
+          >
+            Select Category
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <Dates dates={currentWeek} selected={day} changeSelected={setDay} />
       {none && !loading ? (
         <Text variant='h4' style={{ marginTop: 16 }}>

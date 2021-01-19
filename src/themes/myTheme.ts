@@ -15,6 +15,6 @@ export const myTheme: DefaultTheme = {
     contrastColorPrimary: lighten(0.4, '#00C2CB'),
     colorModalBackground: '#ffffff',
     colorPlaceholder: '#8e8e8e',
-    colorLightGreySelected: darken(0.1, '#535353')
+    colorLightGreySelected: darken(0.1, '#F2F2F2')
   }
 }

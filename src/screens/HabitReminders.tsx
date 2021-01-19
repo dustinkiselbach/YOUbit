@@ -18,7 +18,6 @@ import * as Localization from 'expo-localization'
 import {
   HabitIndexDocument,
   RemindersIndexDocument,
-  RemindersIndexQuery,
   useArchivedHabitsQuery,
   useCreateReminderMutation,
   useDestroyReminderMutation,
@@ -195,7 +194,6 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
                 }}
                 onSubmit={async values => {
                   if (itemToUpdate) {
-                    console.log(values.time)
                     try {
                       await destroyReminder({
                         variables: { reminderId: itemToUpdate.reminderId }
@@ -206,28 +204,13 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
                           remindAt: values.time,
                           habitId: values.id
                           // @todo fix cache update
-                        }
-                        // update: store => {
-                        //   const remindersData = store.readQuery<
-                        //     RemindersIndexQuery
-                        //   >({
-                        //     query: RemindersIndexDocument
-                        //   })
-
-                        //   const newData = remindersData?.remindersIndex.map(())
-
-                        //   store.writeQuery<RemindersIndexQuery>({
-                        //     query: RemindersIndexDocument,
-                        //     data: {
-                        //       remindersIndex: []
-                        //     }
-                        //   })
-                        // }
+                        },
+                        refetchQueries: [{ query: RemindersIndexDocument }]
                       })
+                      setUpdating(false)
                     } catch (err) {
                       console.log(err)
                     }
-                    // update
                   } else {
                     try {
                       await createReminder({

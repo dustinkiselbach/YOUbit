@@ -5,6 +5,7 @@ import { Container, SectionSpacer, Text, Title } from '../components'
 import {
   ArchivedHabitsDocument,
   ArchivedHabitsQuery,
+  CategoriesIndexDocument,
   useArchivedHabitsQuery,
   useArchiveOrActivateHabitMutation,
   useDestroyHabitMutation
@@ -105,6 +106,9 @@ const HabitArchive: React.FC = () => {
                             for (const id of selected) {
                               await destroyHabit({
                                 variables: { habitId: id },
+                                refetchQueries: [
+                                  { query: CategoriesIndexDocument }
+                                ],
                                 update: (store, { data }) => {
                                   const archivedHabits = store.readQuery<
                                     ArchivedHabitsQuery
@@ -253,6 +257,9 @@ const HabitArchive: React.FC = () => {
                                   try {
                                     await destroyHabit({
                                       variables: { habitId: item.id },
+                                      refetchQueries: [
+                                        { query: CategoriesIndexDocument }
+                                      ],
                                       update: (store, { data }) => {
                                         const archivedHabits = store.readQuery<
                                           ArchivedHabitsQuery

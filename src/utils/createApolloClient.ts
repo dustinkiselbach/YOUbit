@@ -17,6 +17,11 @@ const cache = new InMemoryCache({
           merge (_, incoming) {
             return incoming
           }
+        },
+        categoriesIndex: {
+          merge (_, incoming) {
+            return incoming
+          }
         }
       }
     },

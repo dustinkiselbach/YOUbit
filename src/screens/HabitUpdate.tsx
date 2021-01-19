@@ -13,9 +13,11 @@ import {
   Text,
   Button,
   Title,
-  KeyboardAvoidingScrollView
+  KeyboardAvoidingScrollView,
+  CategoryTextAndSelectField
 } from '../components'
 import {
+  useCategoriesIndexQuery,
   useHabitIndexQuery,
   useUpdateHabitMutation
 } from '../generated/graphql'
@@ -28,6 +30,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
   },
   navigation
 }) => {
+  const { data: categoriesData } = useCategoriesIndexQuery()
   const { data, error } = useHabitIndexQuery({
     variables: {
       dayOfWeek: dayOfWeek,
@@ -46,7 +49,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
     return <Text variant='h3'>The Specified habit was not found</Text>
   }
 
-  const { name, frequency, habitType, startDate } = habit[0] ?? {
+  const { name, frequency, habitType, startDate, category } = habit[0] ?? {
     name: null,
     frequency: null,
     habitType: null,
@@ -62,9 +65,10 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
           validateOnBlur={false}
           validateOnChange={false}
           initialValues={{
-            habitType: habitType,
-            name: name,
+            habitType,
+            name,
             period: frequency[0] === 'daily' ? 'daily' : 'select days',
+            category: category.name,
             frequency: frequency[0] !== 'daily' ? frequency : [],
             startDate: new Date(startDate)
           }}
@@ -78,7 +82,7 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
                   frequency:
                     values.period === 'daily' ? ['daily'] : values.frequency,
                   startDate: values.startDate,
-                  categoryName: 'fart'
+                  categoryName: values.category
                 },
                 // @todo fix cache when changing days
                 update: async store => {
@@ -130,6 +134,15 @@ const HabitUpdate: React.FC<HabitStackNav<'HabitUpdate'>> = ({
                   label='Name'
                   autoCapitalize='words'
                   textContentType='name'
+                />
+              </Spacer>
+              <Spacer>
+                <CategoryTextAndSelectField
+                  name='category'
+                  label='Category'
+                  autoCapitalize='words'
+                  textContentType='nickname'
+                  options={categoriesData}
                 />
               </Spacer>
               <Spacer>

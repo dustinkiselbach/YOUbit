@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 interface KeyboardAvoidingScrollViewProps {
   headerHeight?: number
 }
+// keyboardShouldPersistTaps??
 
 const KeyboardAvoidingScrollView: React.FC<KeyboardAvoidingScrollViewProps> = ({
   headerHeight,
@@ -16,7 +17,7 @@ const KeyboardAvoidingScrollView: React.FC<KeyboardAvoidingScrollViewProps> = ({
       enabled
       keyboardVerticalOffset={headerHeight ? headerHeight : 0 + 20}
     >
-      <ScrollView>{children}</ScrollView>
+      <ScrollView keyboardShouldPersistTaps='always'>{children}</ScrollView>
     </KeyboardAvoidingView>
   )
 }

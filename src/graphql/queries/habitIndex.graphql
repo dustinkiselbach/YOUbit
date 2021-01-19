@@ -25,6 +25,9 @@ query habitIndex(
       id
       remindAt
     }
+    category {
+      name
+    }
   }
 }
 # add category!

@@ -56,7 +56,8 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
     isLogged,
     longestStreak,
     currentStreak,
-    reminders
+    reminders,
+    category
   } = habit[0]
 
   return (
@@ -64,9 +65,11 @@ const HabitDetail: React.FC<HabitStackNav<'HabitDetail'>> = ({
       <_HabitDetail>
         <HabitDetailTop>
           <Title>{name}</Title>
-
-          <Text variant='h5' style={{ marginBottom: 4 }}>
-            {habitType}
+          <Text variant='p'>
+            Type: <Text variant='h5'>{habitType}</Text>
+          </Text>
+          <Text variant='p' style={{ marginBottom: 8 }}>
+            Category: <Text variant='h5'>{category.name}</Text>
           </Text>
           <Text variant='p'>{frequency.map(day => day + ' ')}</Text>
 

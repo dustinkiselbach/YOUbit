@@ -770,7 +770,10 @@ export type HabitIndexQuery = (
     )>, reminders?: Maybe<Array<(
       { __typename?: 'Reminder' }
       & Pick<Reminder, 'id' | 'remindAt'>
-    )>> }
+    )>>, category: (
+      { __typename?: 'Category' }
+      & Pick<Category, 'name'>
+    ) }
   )> }
 );
 
@@ -1506,6 +1509,9 @@ export const HabitIndexDocument = gql`
     reminders {
       id
       remindAt
+    }
+    category {
+      name
     }
   }
 }

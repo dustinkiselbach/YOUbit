@@ -13,6 +13,7 @@ import {
 import { daysOfWeek, useLogout } from '../utils'
 import { Feather } from '@expo/vector-icons'
 import { useContext } from 'react'
+import * as Haptics from 'expo-haptics'
 
 // @todo weird cache stuff when changing multiple items
 // needs to be refactored
@@ -182,15 +183,21 @@ const HabitArchive: React.FC = () => {
               return (
                 <ArchivedHabitItem
                   isSelected={isSelected}
-                  onLongPress={() =>
+                  onLongPress={async () => {
+                    await Haptics.impactAsync(
+                      Haptics.ImpactFeedbackStyle.Medium
+                    )
                     setSelected(currSelected =>
                       currSelected.indexOf(item.id) === -1
                         ? [...currSelected, item.id]
                         : currSelected
                     )
-                  }
-                  onPress={() => {
+                  }}
+                  onPress={async () => {
                     if (hasSelectedAny) {
+                      await Haptics.impactAsync(
+                        Haptics.ImpactFeedbackStyle.Light
+                      )
                       if (isSelected) {
                         setSelected(currSelected =>
                           currSelected.filter(cs => cs !== item.id)
@@ -336,6 +343,7 @@ const ArchivedHabitItem = styled.TouchableOpacity<{ isSelected: boolean }>`
   padding: 10px 12px;
   flex-direction: row;
   align-items: center;
+  border-radius: 2px;
 `
 
 const ArchivedHabitIcon = styled.TouchableOpacity`

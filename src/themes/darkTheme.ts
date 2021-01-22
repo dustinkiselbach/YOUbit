@@ -12,7 +12,7 @@ export const darkTheme: DefaultTheme = {
     colorBackground: '#121212',
     colorDanger: '#dc3545',
     contrastColorPrimary: darken(0.1, '#3c8a8e'),
-    colorModalBackground: '#000000',
+    colorModalBackground: 'rgba(255,255,255,0.066)',
     colorPlaceholder: 'rgba(255,255,255,0.6)',
     colorLightGreySelected: 'rgba(255,255,255,0.333)'
   }

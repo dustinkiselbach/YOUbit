@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { HabitCategories, HabitDetail, Habits, HabitUpdate } from '../screens'
 import { HabitStackParamList } from '../types'
 import { ThemeContext } from '../../styled-components'
+import { Platform } from 'react-native'
 
 const Stack = createStackNavigator<HabitStackParamList>()
 // MainStack.Navigator detachInactiveScreens={false} screenOptions={{ animationEnabled: false }}
@@ -16,7 +17,8 @@ const HabitStack: React.FC = () => {
         headerStyle: {
           backgroundColor: themeContext.colors.colorBackground,
           elevation: 0
-        }
+        },
+        animationEnabled: Platform.select({ android: false, ios: true })
       }}
     >
       <Stack.Screen

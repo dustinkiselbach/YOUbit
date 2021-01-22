@@ -15,6 +15,7 @@ import {
 import { Feather } from '@expo/vector-icons'
 import { Formik } from 'formik'
 import * as Localization from 'expo-localization'
+import * as Hapitcs from 'expo-haptics'
 import {
   HabitIndexDocument,
   RemindersIndexDocument,
@@ -98,7 +99,10 @@ const HabitReminders: React.FC<MainTabNav<'HabitReminders'>> = ({
             </ReminderIcon>
           ) : (
             <ReminderIcon
-              onPress={() => setUpdating(isUpdating => !isUpdating)}
+              onPress={async () => {
+                await Hapitcs.impactAsync(Hapitcs.ImpactFeedbackStyle.Light)
+                setUpdating(isUpdating => !isUpdating)
+              }}
             >
               <Feather
                 name='edit'

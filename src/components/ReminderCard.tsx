@@ -145,6 +145,7 @@ const _ReminderCard = styled(Animated.View)`
   padding: 10px 12px;
   flex-direction: row;
   align-items: center;
+  border-radius: 2px;
 `
 
 const Icons = styled.View`

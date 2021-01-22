@@ -1,4 +1,3 @@
-import { ca } from 'date-fns/locale'
 import React, { useContext, useState } from 'react'
 import { ActivityIndicator, View } from 'react-native'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
